@@ -1,0 +1,11 @@
+tmp
+.ruby-version
+*~
+
+# old skool
+.svn
+
+# osx noise
+.DS_Store
+profile
+Icon
