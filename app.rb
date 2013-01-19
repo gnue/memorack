@@ -41,7 +41,7 @@ def render_with_mustache(template, engine = :markdown, options = {}, locals = {}
 		locals[:page][:title]	||= locals[:title] if template == :index
 		locals[:page][:title]	||= [File.basename(template.to_s), locals[:title]].join(' | ')
 
-		mustache :layout, {views: settings.templates_folder}, locals
+		mustache :layout, {views: settings.theme}, locals
 	rescue => e
 		e.to_s
 	end
@@ -55,8 +55,10 @@ def split_extname(path)
 end
 
 
-set :templates_folder, File.expand_path('templates', settings.root)
 set :config, read_json(File.expand_path('config.json', settings.root)) || {}
+
+set :themes_folder, File.expand_path('themes', settings.root)
+set :theme, File.expand_path(settings.config['theme'] || 'default', settings.themes_folder)
 
 
 ### レスポンス
@@ -67,7 +69,7 @@ end
 
 get '/*.css' do |name|
 	begin
-		scss name.to_sym, {views: settings.public_folder}
+		scss name.to_sym, {views: settings.theme}
 	rescue => e
 		e.to_s
 	end
