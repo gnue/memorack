@@ -1,4 +1,4 @@
 {
-	"title":	"メモ",
-	"theme":	"default"
+	"theme":	"oreilly",	// 省略するとデフォルト
+	"title":	"メモ"
 }
