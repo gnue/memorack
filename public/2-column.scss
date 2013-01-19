@@ -1,0 +1,47 @@
+/* ２カラム表示 */
+#content-container {
+	width: 100%;
+}
+
+#menu {
+	width: 30%;
+	min-height: 100px;
+	float: left;
+	margin: 20px 0 20px 0;
+	padding: 0 10px 0 10px;
+	border: dashed 1px #888;
+	border-radius: 10px;
+
+	ul {
+		padding-left: 20px;
+	}
+
+	a:link {
+		color: #369;
+	}
+
+	a:visited {
+		color: #369;
+	}
+
+	a:hover {
+		color: #f00;
+	}
+}
+
+#content {
+	width: 65%;
+	float: right;
+	margin: 0;
+	position: relative;
+}
+
+.clear {
+	clear: both;
+}
+
+/* 文中の折返し */
+pre {
+	white-space: pre-wrap;
+	word-break: break-all;
+}

@@ -1,0 +1,68 @@
+/* 基本 */
+h1 {
+	font-size:1.8em;
+}
+
+h2 {
+	font-size:1.6em;
+}
+
+h3 {
+	font-size:1.2em;
+}
+
+h4, h5, h6 {
+	font-size:1em;
+}
+
+
+/* テーブル */
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 10px 0px;
+}
+
+tr {
+	background: #FFF;
+
+	.altrow {
+		background: #F9F9F9;
+	}
+}
+
+th, caption {
+	text-align:left;
+}
+
+th, td {
+	padding: .5em;
+	line-height:1.5em;
+	border:1px solid #ddd;
+	text-align: left;
+	font-size: .9em
+}
+
+th {
+	color: #555;
+	background: #f2f2f2;
+	padding: .5em .5em;
+  	font-weight:bold;
+}
+
+td {
+	padding: .5em;
+}
+
+caption {
+	font-style: italic;
+	color: #777;
+}
+
+
+/* コード */
+div.codecolorer, code {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+

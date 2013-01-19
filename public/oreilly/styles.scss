@@ -1,0 +1,138 @@
+@import "base";
+
+
+$color: #00cc99;
+
+
+/* mixin */
+
+@mixin theme-color($color) {
+	header {
+		border-top: 12px solid $color;
+	}
+
+	.title {
+	    background: $color;
+	}
+}
+
+
+/* GitHub Badge */
+
+#github {
+	right: -24px;
+	top: 32px;
+	position: absolute;
+	text-decoration: none;
+	text-align: right;
+	width: 320px;
+	@include transform(translate(60px, 42px) rotate(45deg));
+	span {
+		background: black;
+		color: white;
+		font-size: 14px;
+		left: 0;
+		padding: 5px 0;
+		position: absolute;
+		text-align: center;
+		width: 100%;
+		font-family: Arial,Verdana,'Bitstream Vera Sans',Helvetica,sans-serif;
+		font-weight: bold;
+		@include box-shadow(rgba(black, 0.2) 1px 1px 10px);
+	}
+}
+
+
+/* O'reilly Like Style */
+
+#page {
+	width: 800px;
+	margin: auto;
+
+	border: 1px solid #888;
+    padding: 0 36px 0;
+	position: relative;
+
+	@include box-shadow(2px 2px 6px rgba(100, 100, 100, .6));
+}
+
+header {
+	border-top: 12px solid $color;
+    padding: 0;
+}
+
+header a:link {
+	text-decoration: none;
+}
+
+.top-page header {
+    text-align: center;
+}
+
+footer {
+    text-align: center;
+    padding: 0 0 8px;
+}
+
+#lang {
+	font-size: 11px;
+	font-weight: bold;
+}
+
+#lang a:link,
+#lang a:visited {
+	text-decoration: none;
+	color: #444;
+}
+
+.tagline {
+    color: black;
+    font-family: garamond, times new roman, times, serif;
+    font-style: italic;
+    font-weight: normal;
+    font-size: 21px;
+    padding: 0 0 20px 0;
+    margin: 8px 0 0;
+    text-align: center;
+}
+
+.subtitle {
+    color: black;
+    font-family: garamond, times new roman, times, serif;
+    font-style: italic;
+    font-weight: normal;
+    font-size: 28px;
+    padding: 0;
+    margin: 0 0 4px;
+    text-align: left;
+}
+
+.title {
+    background: $color;
+    color: white;
+    font-family: garamond, times new roman, times, serif;
+    font-weight: normal;
+    font-size: 84px;
+    text-align: center;
+    margin: 0 0 30px 0;
+    line-height: 100%;
+}
+
+.logo {
+	margin: 12px;
+}
+
+.content {
+	margin: 24px 30px 24px;
+}
+
+#author {
+    color: black;
+    font-family: garamond, times new roman, times, serif;
+    font-style: italic;
+    font-weight: normal;
+    font-size: 18px;
+    padding: 0;
+    margin: 0;
+    text-align: right;
+}
