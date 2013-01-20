@@ -95,7 +95,7 @@ end
 
 template :menu do
 	mdmenu = MdMenu.new({prefix: '/', uri_escape: true})
-	Dir.chdir('views') { |path| mdmenu.collection('.') }
+	Dir.chdir(settings.views) { |path| mdmenu.collection('.') }
 	mdmenu.generate(StringIO.new).string
 end
 
