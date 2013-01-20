@@ -56,7 +56,7 @@ class MemoApp
 			return result unless result.first == 404
 
 			content_type = 'text/css'
-			content = render :scss, path.to_sym, {views: @theme}
+			content = render :scss, "#{path}.scss", {views: @theme}
 		else
 			return pass(env) unless ext && Tilt.registered?(ext)
 			content = render_with_mustache path.to_sym, ext
@@ -81,10 +81,12 @@ class MemoApp
 	# テンプレートエンジンで render する
 	def render(engine, template, options = {}, locals = {})
 		options[:views] ||= @root
-		path = File.join(options[:views], "#{template}.#{engine}")
+
+		fname = template.kind_of?(String) ? template : "#{template}.#{engine}"
+		path = File.join(options[:views], fname)
 
 		begin
-			engine = Tilt.new(path) {
+			engine = Tilt.new(File.join(File.dirname(path), ".#{engine}")) {
 				if template.kind_of?(Symbol) && Templates.respond_to?(template)
 					data = Templates.send(template, options, locals)
 				else
@@ -113,7 +115,7 @@ class MemoApp
 			locals[:page][:title]	||= locals[:title] if template == :index
 			locals[:page][:title]	||= [File.basename(template.to_s), locals[:title]].join(' | ')
 
-			render :mustache, :layout, {views: @theme}, locals
+			render :mustache, 'index.html', {views: @theme}, locals
 		rescue => e
 			e.to_s
 		end
