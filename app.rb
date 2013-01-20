@@ -20,8 +20,7 @@ def read_json(path)
 	begin
 		data = File.read(path)
 		JSON.parse(data)
-	rescue Exception => e
-		abort e.to_s
+	rescue
 	end
 end
 
