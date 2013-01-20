@@ -83,9 +83,7 @@ end
 
 get '/*' do |path_info|
 	path, ext = split_extname(path_info)
-
-	content_type ext
-	send_file File.join(settings.views, path_info)
+	send_file File.join(settings.views, path_info), {type: ext}
 end
 
 
