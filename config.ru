@@ -1,4 +1,7 @@
 # coding: utf-8
 
-require ::File.expand_path('../app.rb',  __FILE__)
-run Sinatra::Application
+$LOAD_PATH.unshift('./lib')
+
+require 'rack-memo'
+
+run MemoApp.new(nil, root: 'views/', theme: 'themes/oreilly/', markdown: 'kramdown')
