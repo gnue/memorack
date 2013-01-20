@@ -75,16 +75,15 @@ get '/*.css' do |name|
 	end
 end
 
-get '/*' do
-	path, ext = split_extname(params[:splat].first)
+get '/*' do |path|
+	path, ext = split_extname(path)
 
 	pass unless Tilt.registered?(ext)
 	render_with_mustache path.to_sym, ext
 end
 
-
-get '/*' do
-	path, ext = split_extname(params[:splat].first)
+get '/*' do |path|
+	path, ext = split_extname(path)
 
 	content_type ext
 	send_file File.join(settings.views, "#{path}.#{ext}")
