@@ -35,9 +35,10 @@ class MemoApp
 		require options[:markdown] if options[:markdown]
 
 		@options = options
-		@root = options[:root]
+		@root = options[:root] || 'views/'
+		@themes_folder = options[:themes_folder] || 'themes/'
 		@title = options[:title]
-		@theme = options[:theme]
+		@theme = File.join(@themes_folder, options[:theme], '')
 		@apps = @statics = [Rack::File.new(@root), Rack::File.new(@theme)]
 		@apps << app if app
 	end

@@ -4,4 +4,4 @@ $LOAD_PATH.unshift('./lib')
 
 require 'rack-memo'
 
-run MemoApp.new(nil, root: 'views/', theme: 'themes/oreilly/', markdown: 'kramdown')
+run MemoApp.new(nil, root: 'views/', theme: 'oreilly', markdown: 'kramdown')
