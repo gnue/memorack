@@ -12,12 +12,16 @@ require 'mdmenu'
 class MemoApp
 	class Templates
 		# インデックスを作成
-		def self.index(options = {}, locals = {})
-			''
+		def self.index(app, options = {}, locals = {})
+			begin
+				app.render :markdown, 'index.md'
+			rescue
+				''
+			end
 		end
 
 		# メニューを作成
-		def self.menu(options = {}, locals = {})
+		def self.menu(app, options = {}, locals = {})
 			mdmenu = MdMenu.new({prefix: '/', uri_escape: true})
 			Dir.chdir(options[:views]) { |path| mdmenu.collection('.') }
 			mdmenu.generate(StringIO.new).string
@@ -100,19 +104,15 @@ class MemoApp
 		fname = template.kind_of?(String) ? template : "#{template}.#{engine}"
 		path = File.join(options[:views], fname)
 
-		begin
-			engine = Tilt.new(File.join(File.dirname(path), ".#{engine}"), options) {
-				if template.kind_of?(Symbol) && Templates.respond_to?(template)
-					data = Templates.send(template, options, locals)
-				else
-					data = File.binread(path)
-					data.force_encoding('UTF-8')
-				end
-			}
-			engine.render(options, locals)
-		rescue => e
-			e.to_s
-		end
+		engine = Tilt.new(File.join(File.dirname(path), ".#{engine}"), options) {
+			if template.kind_of?(Symbol) && Templates.respond_to?(template)
+				data = Templates.send(template, self, options, locals)
+			else
+				data = File.binread(path)
+				data.force_encoding('UTF-8')
+			end
+		}
+		engine.render(options, locals)
 	end
 
 	# レイアウトに mustache を適用してテンプレートエンジンでレンダリングする
