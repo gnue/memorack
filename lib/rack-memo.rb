@@ -81,6 +81,7 @@ class MemoApp
 
 	# テンプレートエンジンで render する
 	def render(engine, template, options = {}, locals = {})
+		options = options.dup
 		options[:views] ||= @root
 
 		fname = template.kind_of?(String) ? template : "#{template}.#{engine}"
@@ -104,9 +105,13 @@ class MemoApp
 	# レイアウトに mustache を適用してテンプレートエンジンでレンダリングする
 	def render_with_mustache(template, engine = :markdown, options = {}, locals = {})
 		begin
-			menu = render :markdown, :menu, options
+			options = options.dup
 			options[:tables] = true
+
+			menu = render :markdown, :menu, options
 			content = render engine, template, options
+
+			locals = locals.dup
 
 			locals[:menu]			||= menu.force_encoding('UTF-8')
 			locals[:content]		||= content.force_encoding('UTF-8')
