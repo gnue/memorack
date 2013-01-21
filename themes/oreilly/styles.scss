@@ -4,3 +4,10 @@
 @import "../default/styles";
 
 //@include theme-color(#cc0099);
+
+
+#menu {
+	li.selected {
+		background: #f5e;
+	}
+}

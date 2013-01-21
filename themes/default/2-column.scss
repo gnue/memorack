@@ -18,6 +18,7 @@
 
 	a:link {
 		color: #369;
+		text-decoration: none;
 	}
 
 	a:visited {
@@ -26,6 +27,18 @@
 
 	a:hover {
 		color: #f00;
+	}
+
+	li {
+		padding-left: 4px;
+		margin-left: -4px;
+	}
+
+	li.selected {
+		background: #58b;
+		a {
+			color: #fff;
+		}
 	}
 }
 

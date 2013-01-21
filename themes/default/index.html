@@ -13,6 +13,12 @@
 <title>{{page.title}}</title>
 
 <link type="text/css" href="/styles.css" rel="stylesheet" media="all" />
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script type="text/javascript">
+	$(function(){
+		$('#menu a[href="' + document.location.pathname + '"]').parent().addClass('selected');
+	});
+</script>
 
 </head>
 <body>
