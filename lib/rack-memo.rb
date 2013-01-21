@@ -151,7 +151,7 @@ class MemoApp
 	# インデックスを作成
 	template :index do
 		begin
-			render :markdown, 'index.md'
+			render :markdown, 'index.md', {views: @theme}
 		rescue
 			''
 		end
