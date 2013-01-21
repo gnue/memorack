@@ -10,29 +10,6 @@ require 'mdmenu'
 
 
 class MemoApp
-	class Templates
-		# インデックスを作成
-		def self.index(app, options = {}, locals = {})
-			begin
-				app.render :markdown, 'index.md'
-			rescue
-				''
-			end
-		end
-
-		# メニューを作成
-		def self.menu(app, options = {}, locals = {})
-			mdmenu = MdMenu.new({prefix: '/', uri_escape: true})
-			Dir.chdir(options[:views]) { |path| mdmenu.collection('.') }
-			mdmenu.generate(StringIO.new).string
-		end
-	end
-
-	# テンプレート
-	def self.template(name, &block)
-		Templates.define_method(name, &block)
-	end
-
 	def initialize(app, options={})
 		options = to_sym_keys(options)
 		options.merge!(read_config(options[:config])) if options[:config]
@@ -105,8 +82,10 @@ class MemoApp
 		path = File.join(options[:views], fname)
 
 		engine = Tilt.new(File.join(File.dirname(path), ".#{engine}"), options) {
-			if template.kind_of?(Symbol) && Templates.respond_to?(template)
-				data = Templates.send(template, self, options, locals)
+			method = MemoApp.template_method(template)
+
+			if method && respond_to?(method)
+				data = send(method)
 			else
 				data = File.binread(path)
 				data.force_encoding('UTF-8')
@@ -156,4 +135,33 @@ class MemoApp
 			memo
 		}
 	end
+
+	# テンプレート名
+	def self.template_method(name)
+		name.kind_of?(Symbol) && "template_#{name}".to_sym
+	end
+
+	# テンプレートを作成する
+	def self.template(name, &block)
+		define_method(self.template_method(name), &block)
+	end
+
+	#### テンプレート
+
+	# インデックスを作成
+	template :index do
+		begin
+			render :markdown, 'index.md'
+		rescue
+			''
+		end
+	end
+
+	# メニューを作成
+	template :menu do
+		mdmenu = MdMenu.new({prefix: '/', uri_escape: true})
+		Dir.chdir(@root) { |path| mdmenu.collection('.') }
+		mdmenu.generate(StringIO.new).string
+	end
+
 end
