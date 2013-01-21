@@ -31,6 +31,7 @@ class MemoApp
 
 	def initialize(app, options={})
 		options = to_sym_keys(options)
+		options.merge!(read_config(options[:config])) if options[:config]
 
 		require options[:markdown] if options[:markdown]
 
@@ -68,6 +69,18 @@ class MemoApp
 		[200, {'Content-Type' => content_type}, [content.to_s]]
 	end
 
+
+	# 設定ファイルを読込む
+	def read_config(path)
+		begin
+			require 'json'
+
+			data = File.read(path)
+			to_sym_keys(JSON.parse(data))
+		rescue
+			{}
+		end
+	end
 
 	# 次のアプリにパスする
 	def pass(env, apps = @apps)
