@@ -123,6 +123,7 @@ class MemoApp
 
 			menu = render :markdown, :menu, options
 			content = render engine, template, options
+			fname = template.to_s.force_encoding('UTF-8')
 
 			locals = locals.dup
 
@@ -132,7 +133,7 @@ class MemoApp
 			locals[:page]			||= {}
 
 			locals[:page][:title]	||= locals[:title] if template == :index
-			locals[:page][:title]	||= [File.basename(template.to_s), locals[:title]].join(' | ')
+			locals[:page][:title]	||= [File.basename(fname), locals[:title]].join(' | ')
 
 			render :mustache, 'index.html', {views: @theme}, locals
 		rescue => e
