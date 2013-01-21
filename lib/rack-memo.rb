@@ -5,7 +5,7 @@ require 'rack'
 require 'sass'
 require 'uri'
 
-require 'sinatra-mustache'
+require 'tilt-mustache'
 require 'mdmenu'
 
 
