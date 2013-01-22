@@ -13,8 +13,7 @@ class MemoApp
 	DEFAULT_APP_OPTIONS = {
 		root:			'views/',
 		themes_folder:	'themes/',
-		theme:			'default/',
-		custom:			'custom/',
+		theme:			'default',
 		markdown:		'redcarpet',
 		title:			'memo'
 	}
@@ -28,7 +27,9 @@ class MemoApp
 
 	def initialize(app, options={})
 		options = DEFAULT_OPTIONS.merge(to_sym_keys(options))
-		read_config(options[:custom], options[:themes_folder], options)
+
+		@themes_folders = [options[:themes_folder], File.expand_path('../themes/', __FILE__)]
+		read_config(options[:theme], options)
 
 		use_engine(options[:markdown])
 
@@ -77,18 +78,35 @@ class MemoApp
 		Object.send(:remove_const, :RedcarpetCompat) if defined?(RedcarpetCompat) == 'constant'
 	end
 
+	# テーマのパスを取得する
+	def theme_path(theme)
+		return nil unless theme
+
+		@themes_folders.each { |folder|
+			path = theme && File.join(folder, theme)
+			return path if File.exists?(path) && FileTest::directory?(path)
+		}
+
+		nil
+	end
+
 	# 設定ファイルを読込む
-	def read_config(dir, themes_folder, options = {})
+	def read_config(theme, options = {})
 		@themes ||= []
+		options_chain = []
 
 		begin
 			require 'json'
 
-			options_chain = []
+			while theme
+				dir = theme_path(theme)
+				break unless dir
+				break if @themes.member?(dir)
 
-			while dir
+				# テーマ・チェインに追加
 				@themes << File.join(dir, '')
 
+				# config の読込み
 				path = File.join(dir, 'config.json')
 				break unless File.readable?(path)
 
@@ -96,14 +114,12 @@ class MemoApp
 				options_chain << to_sym_keys(JSON.parse(data))
 
 				theme = options_chain.last[:theme]
-				dir = theme && File.join(themes_folder, theme)
 			end
-
-			options_chain.reverse.each { |opts| options.merge!(opts) }
 		rescue
 		end
 
-		@themes.uniq!
+		# オプションをマージ
+		options_chain.reverse.each { |opts| options.merge!(opts) }
 		options
 	end
 
