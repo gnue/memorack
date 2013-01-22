@@ -10,7 +10,13 @@ require 'mdmenu'
 
 
 class MemoApp
-	DEFAULT_OPTIONS = {root: 'views/', themes_folder: 'themes/', title: 'memo'}
+	DEFAULT_OPTIONS = {
+		root:			'views/',
+		themes_folder:	'themes/',
+		theme:			'default/',
+		markdown:		'redcarpet',
+		title:			'memo'
+	}
 
 	def initialize(app, options={})
 		options = DEFAULT_OPTIONS.merge(to_sym_keys(options))
