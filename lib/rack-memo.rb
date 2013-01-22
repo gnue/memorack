@@ -91,6 +91,8 @@ class MemoApp
 				data = File.binread(path)
 				data.force_encoding('UTF-8')
 			end
+
+			data
 		}
 		engine.render(options, locals)
 	end
