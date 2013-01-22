@@ -27,13 +27,14 @@ class MemoApp
 
 		use_engine(options[:markdown])
 
+		@app = app
 		@options = options
 		@root = options[:root]
 		@themes_folder = options[:themes_folder]
 		@title = options[:title]
 		@theme = File.join(@themes_folder, options[:theme], '')
-		@apps = @statics = [Rack::File.new(@root), Rack::File.new(@theme)]
-		@apps << app if app
+
+		define_statics(@root, @theme)
 	end
 
 	def call(env)
@@ -82,9 +83,18 @@ class MemoApp
 		end
 	end
 
+	# 静的ファイルの参照先を定義する
+	def define_statics(*args)
+		@statics = [] unless @statics
+
+		@statics |= args.collect { |root| Rack::File.new(root) }
+	end
+
 	# 次のアプリにパスする
-	def pass(env, apps = @apps)
+	def pass(env, apps = @statics + [@app])
 		apps.each { |app|
+			next unless app
+
 			result =  app.call(env)
 			return result unless result.first == 404
 		}
