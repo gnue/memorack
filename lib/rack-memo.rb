@@ -42,6 +42,9 @@ class MemoApp
 
 		# @options からテンプレートで使わないものを削除
 		DEFAULT_APP_OPTIONS.each { |key, item| @options.delete(key) }
+
+		# ファイル監視を行う
+		watcher(@root)
 	end
 
 	def call(env)
@@ -142,6 +145,24 @@ class MemoApp
 		[404, {'Content-Type' => 'text/plain'}, ['File not found: ', env['PATH_INFO']]]
 	end
 
+	# ファイル監視を行う
+	def watcher(path = '.')
+		require 'directory_watcher'
+
+		dw = DirectoryWatcher.new path, :pre_load => true
+		dw.interval = 1
+		dw.stable = 2
+		dw.glob = '**/*'
+		dw.add_observer { |*args|
+			t = Time.now.strftime("%Y-%m-%d %H:%M:%S")
+			puts "[#{t}] regeneration: #{args.size} files changed"
+
+			@menu = nil
+		}
+
+		dw.start
+	end
+
 	# テンプレートエンジンで render する
 	def render(engine, template, options = {}, locals = {})
 		options = {views: @root}.merge(options)
@@ -177,7 +198,7 @@ class MemoApp
 
 			data
 		}
-		engine.render(options, locals)
+		engine.render(options, locals).force_encoding('UTF-8')
 	end
 
 	# レイアウトに mustache を適用してテンプレートエンジンでレンダリングする
@@ -185,14 +206,14 @@ class MemoApp
 		begin
 			options = @options.merge(options)
 
-			menu = render :markdown, :menu, options
+			@menu ||= render :markdown, :menu, options
 			content = render engine, template, options
 			fname = template.to_s.force_encoding('UTF-8')
 
 			locals = locals.dup
 
-			locals[:menu]			||= menu.force_encoding('UTF-8')
-			locals[:content]		||= content.force_encoding('UTF-8')
+			locals[:menu]			||= @menu
+			locals[:content]		||= content
 			locals[:title]			||= @title
 			locals[:page]			||= {}
 

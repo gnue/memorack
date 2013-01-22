@@ -9,3 +9,4 @@ gem 'bluecloth'	# 日本語リンクが NG
 gem 'mustache'
 gem 'json'
 gem 'sass'
+gem 'directory_watcher'
