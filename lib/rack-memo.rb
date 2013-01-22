@@ -10,15 +10,17 @@ require 'mdmenu'
 
 
 class MemoApp
+	DEFAULT_OPTIONS = {root: 'views/', themes_folder: 'themes/', title: 'memo'}
+
 	def initialize(app, options={})
-		options = to_sym_keys(options)
+		options = DEFAULT_OPTIONS.merge(to_sym_keys(options))
 		options.merge!(read_config(options[:config])) if options[:config]
 
 		require options[:markdown] if options[:markdown]
 
 		@options = options
-		@root = options[:root] || 'views/'
-		@themes_folder = options[:themes_folder] || 'themes/'
+		@root = options[:root]
+		@themes_folder = options[:themes_folder]
 		@title = options[:title]
 		@theme = File.join(@themes_folder, options[:theme], '')
 		@apps = @statics = [Rack::File.new(@root), Rack::File.new(@theme)]
@@ -108,7 +110,7 @@ class MemoApp
 
 			locals[:menu]			||= menu.force_encoding('UTF-8')
 			locals[:content]		||= content.force_encoding('UTF-8')
-			locals[:title]			||= @title || 'memo'
+			locals[:title]			||= @title
 			locals[:page]			||= {}
 
 			locals[:page][:title]	||= locals[:title] if template == :index
