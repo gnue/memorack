@@ -15,7 +15,10 @@ class MemoApp
 		themes_folder:	'themes/',
 		theme:			'default/',
 		markdown:		'redcarpet',
-		title:			'memo'
+		title:			'memo',
+
+		# テンプレートエンジンのオプション
+		tables:			true
 	}
 
 	def initialize(app, options={})
@@ -114,7 +117,7 @@ class MemoApp
 	# レイアウトに mustache を適用してテンプレートエンジンでレンダリングする
 	def render_with_mustache(template, engine = :markdown, options = {}, locals = {})
 		begin
-			options = {tables: true}.merge(options)
+			options = @options.merge(options)
 
 			menu = render :markdown, :menu, options
 			content = render engine, template, options
