@@ -77,8 +77,7 @@ class MemoApp
 
 	# テンプレートエンジンで render する
 	def render(engine, template, options = {}, locals = {})
-		options = options.dup
-		options[:views] ||= @root
+		options = {views: @root}.merge(options)
 
 		fname = template.kind_of?(String) ? template : "#{template}.#{engine}"
 		path = File.join(options[:views], fname)
@@ -99,8 +98,7 @@ class MemoApp
 	# レイアウトに mustache を適用してテンプレートエンジンでレンダリングする
 	def render_with_mustache(template, engine = :markdown, options = {}, locals = {})
 		begin
-			options = options.dup
-			options[:tables] = true
+			options = {tables: true}.merge(options)
 
 			menu = render :markdown, :menu, options
 			content = render engine, template, options
