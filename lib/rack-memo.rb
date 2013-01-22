@@ -10,17 +10,21 @@ require 'mdmenu'
 
 
 class MemoApp
-	DEFAULT_OPTIONS = {
+	DEFAULT_APP_OPTIONS = {
 		root:			'views/',
 		themes_folder:	'themes/',
 		theme:			'default/',
 		custom:			'custom/',
 		markdown:		'redcarpet',
-		title:			'memo',
+		title:			'memo'
+	}
 
-		# テンプレートエンジンのオプション
+	# テンプレートエンジンのオプション
+	DEFAULT_TEMPLATE_OPTIONS = {
 		tables:			true
 	}
+
+	DEFAULT_OPTIONS = DEFAULT_APP_OPTIONS.merge(DEFAULT_TEMPLATE_OPTIONS)
 
 	def initialize(app, options={})
 		options = DEFAULT_OPTIONS.merge(to_sym_keys(options))
@@ -39,6 +43,9 @@ class MemoApp
 		@themes.unshift(options[:custom])
 
 		define_statics(@root, *@themes)
+
+		# @options からテンプレートで使わないものを削除
+		DEFAULT_APP_OPTIONS.each { |key, item| @options.delete(key) }
 	end
 
 	def call(env)
