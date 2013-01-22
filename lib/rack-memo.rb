@@ -28,19 +28,14 @@ class MemoApp
 
 	def initialize(app, options={})
 		options = DEFAULT_OPTIONS.merge(to_sym_keys(options))
-		options.merge!(read_config(options[:config])) if options[:config]
+		read_config(options[:custom], options[:themes_folder], options)
 
 		use_engine(options[:markdown])
 
 		@app = app
 		@options = options
 		@root = options[:root]
-		@themes_folder = options[:themes_folder]
 		@title = options[:title]
-
-		themes = [options[:theme], 'default'].uniq
-		@themes = themes.collect { |path| File.join(@themes_folder, path, '') }
-		@themes.unshift(options[:custom])
 
 		define_statics(@root, *@themes)
 
@@ -83,15 +78,33 @@ class MemoApp
 	end
 
 	# 設定ファイルを読込む
-	def read_config(path)
+	def read_config(dir, themes_folder, options = {})
+		@themes ||= []
+
 		begin
 			require 'json'
 
-			data = File.read(path)
-			to_sym_keys(JSON.parse(data))
+			options_chain = []
+
+			while dir
+				@themes << File.join(dir, '')
+
+				path = File.join(dir, 'config.json')
+				break unless File.readable?(path)
+
+				data = File.read(path)
+				options_chain << to_sym_keys(JSON.parse(data))
+
+				theme = options_chain.last[:theme]
+				dir = theme && File.join(themes_folder, theme)
+			end
+
+			options_chain.reverse.each { |opts| options.merge!(opts) }
 		rescue
-			{}
 		end
+
+		@themes.uniq!
+		options
 	end
 
 	# 静的ファイルの参照先を定義する

@@ -3,10 +3,11 @@
 //	"markdown":	"kramdown",		// 使用する markdownライブラリ
 
 	// redcarpet の拡張構文
-	"strikethrough":		true,	// 例: ~~good~~
-	"fenced_code_blocks":	true,	// 例: ```ruby
-	"superscript":			true,	// 例: 2^10
+//	"tables":				false,	// テーブル
+//	"strikethrough":		false,	// 例: ~~good~~
+//	"fenced_code_blocks":	false,	// 例: ```ruby
+//	"superscript":			false,	// 例: 2^10
 //	"autolink":				true,	// 例: http://0.0.0.0/
 
-	"title":	"メモ"
+	"title":	"覚書き"
 }
