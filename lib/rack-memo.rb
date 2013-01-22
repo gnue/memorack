@@ -16,7 +16,7 @@ class MemoApp
 		options = DEFAULT_OPTIONS.merge(to_sym_keys(options))
 		options.merge!(read_config(options[:config])) if options[:config]
 
-		require options[:markdown] if options[:markdown]
+		use_engine(options[:markdown])
 
 		@options = options
 		@root = options[:root]
@@ -52,6 +52,14 @@ class MemoApp
 		[200, {'Content-Type' => content_type}, [content.to_s]]
 	end
 
+
+	# テンプレートエンジンを使用できるようにする
+	def use_engine(engine)
+		require engine if engine
+
+		# Tilt で Redcarpet 2.x を使うためのおまじない
+		Object.send(:remove_const, :RedcarpetCompat) if defined?(RedcarpetCompat) == 'constant'
+	end
 
 	# 設定ファイルを読込む
 	def read_config(path)

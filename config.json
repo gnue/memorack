@@ -1,6 +1,6 @@
 {
-	"theme":	"oreilly",	// 省略するとデフォルト
-	"markdown":	"kramdown",	// 使用する markdownライブラリ	
+	"theme":	"oreilly",		// 省略するとデフォルト
+	"markdown":	"redcarpet",	// 使用する markdownライブラリ
 
 	"title":	"メモ"
 }
