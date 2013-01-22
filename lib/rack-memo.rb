@@ -14,6 +14,7 @@ class MemoApp
 		root:			'views/',
 		themes_folder:	'themes/',
 		theme:			'default/',
+		custom:			'custom/',
 		markdown:		'redcarpet',
 		title:			'memo',
 
@@ -35,6 +36,7 @@ class MemoApp
 
 		themes = [options[:theme], 'default'].uniq
 		@themes = themes.collect { |path| File.join(@themes_folder, path, '') }
+		@themes.unshift(options[:custom])
 
 		define_statics(@root, *@themes)
 	end
