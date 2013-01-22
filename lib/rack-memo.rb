@@ -32,9 +32,11 @@ class MemoApp
 		@root = options[:root]
 		@themes_folder = options[:themes_folder]
 		@title = options[:title]
-		@theme = File.join(@themes_folder, options[:theme], '')
 
-		define_statics(@root, @theme)
+		themes = [options[:theme], 'default'].uniq
+		@themes = themes.collect { |path| File.join(@themes_folder, path, '') }
+
+		define_statics(@root, *@themes)
 	end
 
 	def call(env)
@@ -51,7 +53,7 @@ class MemoApp
 			return result unless result.first == 404
 
 			content_type = 'text/css'
-			content = render :scss, "#{path}.scss", {views: @theme, cache_location: './tmp/sass-cache'}
+			content = render :scss, "#{path}.scss", {views: @themes, cache_location: './tmp/sass-cache'}
 		else
 			return pass(env) unless ext && Tilt.registered?(ext)
 			content = render_with_mustache path.to_sym, ext
@@ -106,6 +108,22 @@ class MemoApp
 	def render(engine, template, options = {}, locals = {})
 		options = {views: @root}.merge(options)
 
+		if options[:views].kind_of?(Array)
+			err = nil
+
+			options[:views].each { |views|
+				options[:views] = views
+
+				begin
+					return render(engine, template, options, locals)
+				rescue Errno::ENOENT => e
+					err = e
+				end
+			}
+
+			raise err
+		end
+
 		fname = template.kind_of?(String) ? template : "#{template}.#{engine}"
 		path = File.join(options[:views], fname)
 
@@ -143,7 +161,7 @@ class MemoApp
 			locals[:page][:title]	||= locals[:title] if template == :index
 			locals[:page][:title]	||= [File.basename(fname), locals[:title]].join(' | ')
 
-			render :mustache, 'index.html', {views: @theme}, locals
+			render :mustache, 'index.html', {views: @themes}, locals
 		rescue => e
 			e.to_s
 		end
@@ -180,7 +198,7 @@ class MemoApp
 	# インデックスを作成
 	template :index do
 		begin
-			render :markdown, 'index.md', {views: @theme}
+			render :markdown, 'index.md', {views: @themes}
 		rescue
 			''
 		end
