@@ -73,6 +73,12 @@ class MemoApp
 	end
 
 
+	# リダイレクト
+	def redirect(url, code = 301)
+		# 301 = 恒久的, 302 = 一時的, 303, 410
+		[code, {'Content-Type' => 'text/html', 'Location' => url}, ['Redirect: ', url]]
+	end
+
 	# テンプレートエンジンを使用できるようにする
 	def use_engine(engine)
 		require engine if engine
