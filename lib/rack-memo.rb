@@ -50,7 +50,9 @@ class MemoApp
 	def call(env)
 		content_type = 'text/html'
 
-		path_info = URI.unescape(env['PATH_INFO'])
+		req = Rack::Request.new(env)
+		query = Rack::Utils.parse_query(req.query_string)
+		path_info = URI.unescape(req.path_info)
 		path, ext = split_extname(path_info)
 
 		case path_info
@@ -64,6 +66,16 @@ class MemoApp
 			content = render :scss, "#{path}.scss", {views: @themes, cache_location: './tmp/sass-cache'}
 		else
 			return pass(env) unless ext && Tilt.registered?(ext)
+
+			if query.has_key?('edit')
+				fullpath = File.expand_path(File.join(@root, path_info))
+
+				# @attention リダイレクトはうまく動作しない
+				#
+				# redirect_url = 'file://' + File.expand_path(File.join(@root, req.path_info))
+				# return redirect(redirect_url, 302) if File.exists?(fullpath)
+			end
+
 			content = render_with_mustache path.to_sym, ext
 		end
 
