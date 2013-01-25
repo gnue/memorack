@@ -10,13 +10,14 @@ require 'mdmenu'
 
 class MemoApp
 	DEFAULT_APP_OPTIONS = {
-		root:			'views/',
-		themes_folder:	'themes/',
-		theme:			'default',
-		markdown:		'redcarpet',
-		css:			nil,
+		root:				'views/',
+		themes_folder:		'themes/',
+		theme:				'default',
+		markdown:			'redcarpet',
+		css:				nil,
+		directory_watcher:	false,
 
-		title:			'memo'
+		title:				'memo'
 	}
 
 	# テンプレートエンジンのオプション
@@ -39,6 +40,7 @@ class MemoApp
 		@root = options[:root]
 		@title = options[:title]
 		@css = options[:css]
+		@directory_watcher = options[:directory_watcher]
 
 		define_statics(@root, *@themes)
 
@@ -46,7 +48,7 @@ class MemoApp
 		DEFAULT_APP_OPTIONS.each { |key, item| @options.delete(key) }
 
 		# ファイル監視を行う
-		watcher(@root)
+		watcher(@root) if @directory_watcher
 	end
 
 	def call(env)
@@ -230,6 +232,8 @@ class MemoApp
 	def render_with_mustache(template, engine = :markdown, options = {}, locals = {})
 		begin
 			options = @options.merge(options)
+
+			@menu = nil unless @directory_watcher	# ファイル監視していない場合はメニューを初期化
 
 			@menu ||= render :markdown, :menu, options
 			content = render engine, template, options
