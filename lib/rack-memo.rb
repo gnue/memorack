@@ -33,19 +33,19 @@ class MemoApp
 		@themes_folders = [options[:themes_folder], File.expand_path('../themes/', __FILE__)]
 		read_config(options[:theme], options)
 
-		use_engine(options[:markdown])
-
 		@app = app
 		@options = options
-		@root = options[:root]
-		@title = options[:title]
-		@css = options[:css]
-		@directory_watcher = options[:directory_watcher]
 
+		# DEFAULT_APP_OPTIONS に含まれるキーをすべてインスタンス変数に登録する
+		DEFAULT_APP_OPTIONS.each { |key, item|
+			instance_variable_set("@#{key}".to_sym, options[key])
+
+			# @options からテンプレートで使わないものを削除
+			@options.delete(key)
+		}
+
+		use_engine(@markdown)
 		define_statics(@root, *@themes)
-
-		# @options からテンプレートで使わないものを削除
-		DEFAULT_APP_OPTIONS.each { |key, item| @options.delete(key) }
 
 		# ファイル監視を行う
 		watcher(@root) if @directory_watcher
