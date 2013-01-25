@@ -2,7 +2,6 @@
 
 require 'rubygems'
 require 'rack'
-require 'sass'
 require 'uri'
 
 require 'tilt-mustache'
@@ -15,6 +14,8 @@ class MemoApp
 		themes_folder:	'themes/',
 		theme:			'default',
 		markdown:		'redcarpet',
+		css:			nil,
+
 		title:			'memo'
 	}
 
@@ -37,6 +38,7 @@ class MemoApp
 		@options = options
 		@root = options[:root]
 		@title = options[:title]
+		@css = options[:css]
 
 		define_statics(@root, *@themes)
 
@@ -59,11 +61,16 @@ class MemoApp
 		when '/'
 			content = render_with_mustache :index, :markdown
 		when /\.css$/
-			result = pass(env, @statics)
-			return result unless result.first == 404
+			case @css
+			when 'scss', 'sass'
+				require 'sass'
 
-			content_type = 'text/css'
-			content = render :scss, "#{path}.scss", {views: @themes, cache_location: './tmp/sass-cache'}
+				result = pass(env, @statics)
+				return result unless result.first == 404
+
+				content_type = 'text/css'
+				content = render @css.to_sym, "#{path}.#{@css}", {views: @themes, cache_location: './tmp/sass-cache'}
+			end
 		else
 			return pass(env) unless ext && Tilt.registered?(ext)
 

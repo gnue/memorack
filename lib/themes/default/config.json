@@ -1,4 +1,5 @@
 {
+	"css":		"scss",			// scss の自動変換を使用する
 //	"markdown":	"kramdown",		// 使用する markdownライブラリ
 
 	// redcarpet の拡張構文
