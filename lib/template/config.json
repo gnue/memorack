@@ -1,13 +1,14 @@
 {
-	"theme":	"oreilly",		// 省略するとデフォルト
-//	"markdown":	"kramdown",		// 使用する markdownライブラリ
+//	"directory_watcher":	true,		// ファイルの変更を監視するか決める
+	"theme":				"oreilly",	// テーマ（省略すると default ）
+//	"markdown":				"kramdown",	// 使用する markdownライブラリ（省略すると redcarpet ）
 
 	// redcarpet の拡張構文
-//	"tables":				false,	// テーブル
-//	"strikethrough":		false,	// 例: ~~good~~
-//	"fenced_code_blocks":	false,	// 例: ```ruby
-//	"superscript":			false,	// 例: 2^10
-//	"autolink":				true,	// 例: http://0.0.0.0/
+//	"tables":				false,		// テーブル
+//	"strikethrough":		false,		// 例: ~~good~~
+//	"fenced_code_blocks":	false,		// 例: ```ruby
+//	"superscript":			false,		// 例: 2^10
+//	"autolink":				true,		// 例: http://0.0.0.0/
 
-	"title":	"覚書き"
+	"title":				"覚書き"		// タイトル
 }
