@@ -1,7 +1,4 @@
-tmp
-.sass-cache
-.ruby-version
-*~
+pkg/*
 
 # old skool
 .svn
