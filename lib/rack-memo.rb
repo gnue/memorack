@@ -7,8 +7,8 @@ require 'uri'
 require 'tilt-mustache'
 require 'mdmenu'
 
-
-class MemoApp
+module MemoRack
+  class MemoApp
 	DEFAULT_APP_OPTIONS = {
 		root:				'views/',
 		themes_folder:		'themes/',
@@ -299,4 +299,5 @@ class MemoApp
 		mdmenu.generate(StringIO.new).string
 	end
 
+  end
 end

@@ -4,4 +4,4 @@ $LOAD_PATH.unshift('./lib')
 
 require 'rack-memo'
 
-run MemoApp.new(nil, theme: 'custom')
+run MemoRack::MemoApp.new(nil, theme: 'custom')
