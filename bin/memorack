@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+#
+#  Created on 2013-1-27.
+#  Copyright (c) 2013. All rights reserved.
+
+require 'rubygems'
+require File.expand_path(File.dirname(__FILE__) + "/../lib/MemoRack")
+require "memorack/cli"
+
+Memorack::CLI.execute(STDOUT, ARGV)
