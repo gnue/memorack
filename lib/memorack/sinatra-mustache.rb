@@ -1,7 +1,7 @@
 # coding: utf-8
 
 require 'sinatra/base'
-require 'tilt-mustache'
+require 'memorack/tilt-mustache'
 
 
 module Sinatra
