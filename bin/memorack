@@ -4,7 +4,7 @@
 #  Copyright (c) 2013. All rights reserved.
 
 require 'rubygems'
-require File.expand_path(File.dirname(__FILE__) + "/../lib/MemoRack")
+require File.expand_path(File.dirname(__FILE__) + "/../lib/memorack")
 require "memorack/cli"
 
-Memorack::CLI.execute(STDOUT, ARGV)
+MemoRack::CLI.execute(STDOUT, ARGV)

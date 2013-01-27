@@ -1,7 +1,8 @@
 require 'optparse'
 
-module Memorack
+module MemoRack
   class CLI
+
     def self.execute(stdout, arguments=[])
       cmd = File.basename($0)
       options = {port: 9292, theme: 'oreilly'}
