@@ -3,17 +3,39 @@ require 'optparse'
 module Memorack
   class CLI
     def self.execute(stdout, arguments=[])
-
-      # NOTE: the option -p/--path= is given as an example, and should be replaced in your application.
-
+      cmd = File.basename($0)
       options = {port: 9292, theme: 'oreilly'}
       mandatory_options = %w(  )
 
       parser = OptionParser.new do |opts|
         opts.banner = <<-BANNER.gsub(/^          /,'')
-          Usage: #{File.basename($0)} create PATH
-                 #{File.basename($0)} server [options] PATH
+          Usage: #{cmd} create [options] PATH
+                 #{cmd} server [options] PATH
         BANNER
+
+        opts.separator ""
+        opts.on("-h", "--help",
+                "Show this help message.") { abort opts.help }
+
+        if mandatory_options && mandatory_options.find { |option| options[option.to_sym].nil? }
+          abort opts.help
+        end
+      end
+
+      # サブコマンドのオプション解析
+      subparsers = Hash.new {|h,k| abort "#{cmd}: '#{k}' is not a #{cmd} command. See '#{cmd} --help'" }
+
+      # create のオプション解析
+      subparsers['create'] = OptionParser.new do |opts|
+        opts.banner = "Usage: #{cmd} create [options] PATH"
+
+        opts.on("-h", "--help",
+                "Show this help message.") { abort opts.help }
+      end
+
+      # server のオプション解析
+      subparsers['server'] = OptionParser.new do |opts|
+        opts.banner = "Usage: #{cmd} server [options] PATH"
 
         opts.separator ""
         opts.separator "Server options:"
@@ -21,27 +43,30 @@ module Memorack
                 "use PORT (default: #{options[:port]})") { |arg| options[:port] = arg }
         opts.on("-t", "--theme THEME", String,
                 "use THEME (default: oreilly)") { |arg| options[:theme] = arg }
-
-        opts.separator ""
-        opts.separator "Common options:"
         opts.on("-h", "--help",
-                "Show this help message.") { stdout.puts opts; exit }
-        opts.parse!(arguments)
-
-        if mandatory_options && mandatory_options.find { |option| options[option.to_sym].nil? }
-          stdout.puts opts; exit
-        end
+                "Show this help message.") { abort opts.help }
       end
 
-      subcmd, path = arguments
+      parser.order!(ARGV)
+      abort parser.help if ARGV.empty?
+
+      subcmd = ARGV.shift
+      subparser = subparsers[subcmd]
+      subparser.parse!(ARGV)
 
       # do stuff
       case subcmd
       when 'create'
+        path = ARGV.shift
+        abort subparser.help unless path
+
         require 'fileutils'
         FileUtils.copy_entry(File.expand_path('../template', __FILE__), path)
         stdout.puts "created #{path}"
       when 'server'
+        path = ARGV.shift
+        abort subparser.help unless path
+
         require 'rack/builder'
         require 'rack/handler/webrick'
         app = Rack::Builder.new {
@@ -54,7 +79,7 @@ module Memorack
         }
         Rack::Server.new(:app => app, :Port => options[:port]).start
       else
-        stdout.puts parser.help
+        abort parser.help
       end
     end
   end
