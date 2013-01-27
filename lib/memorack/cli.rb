@@ -6,7 +6,7 @@ module Memorack
 
       # NOTE: the option -p/--path= is given as an example, and should be replaced in your application.
 
-      options = {}
+      options = {port: 9292}
       mandatory_options = %w(  )
 
       parser = OptionParser.new do |opts|
@@ -18,8 +18,8 @@ module Memorack
           Options are:
         BANNER
         opts.separator ""
-        opts.on("", "--create PATH", String,
-                "Create template") { |arg| options[:path] = arg }
+        opts.on("-p", "--port PORT", String,
+                "Use server port") { |arg| options[:port] = arg }
         opts.on("-h", "--help",
                 "Show this help message.") { stdout.puts opts; exit }
         opts.parse!(arguments)
@@ -29,13 +29,16 @@ module Memorack
         end
       end
 
-      path = options[:path]
+      subcmd, path = arguments
 
       # do stuff
-      if path
+      case subcmd
+      when 'create'
 		require 'fileutils'
       	FileUtils.copy_entry(File.expand_path('../template', __FILE__), path)
 	    stdout.puts "created #{path}"
+	  else
+        stdout.puts parser.help
       end
     end
   end
