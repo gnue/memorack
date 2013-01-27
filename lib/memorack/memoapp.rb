@@ -12,6 +12,7 @@ module MemoRack
 		DEFAULT_APP_OPTIONS = {
 			root:				'views/',
 			themes_folder:		'themes/',
+			tmpdir:				'tmpdir/',
 			theme:				'default',
 			markdown:			'redcarpet',
 			css:				nil,
@@ -71,7 +72,8 @@ module MemoRack
 					return result unless result.first == 404
 
 					content_type = 'text/css'
-					content = render @css.to_sym, "#{path}.#{@css}", {views: @themes, cache_location: './tmp/sass-cache'}
+					cache_location = File.expand_path('sass-cache', @tmpdir)
+					content = render @css.to_sym, "#{path}.#{@css}", {views: @themes, cache_location: cache_location}
 				end
 			else
 				return pass(env) unless ext && Tilt.registered?(ext)

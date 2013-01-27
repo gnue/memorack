@@ -46,7 +46,11 @@ module Memorack
         require 'rack/handler/webrick'
         app = Rack::Builder.new {
           require 'memorack'
-          run MemoRack::MemoApp.new(nil, theme: options[:theme], root: path)
+          require 'tmpdir'
+
+          Dir.mktmpdir do |tmpdir|
+            run MemoRack::MemoApp.new(nil, theme: options[:theme], root: path, tmpdir: tmpdir)
+          end
         }
         Rack::Server.new(:app => app, :Port => options[:port]).start
       else
