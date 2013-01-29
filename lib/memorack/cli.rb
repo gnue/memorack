@@ -60,10 +60,11 @@ module MemoRack
       when 'create'
         path = ARGV.shift
         abort subparser.help unless path
+		abort "File exists '#{path}'" if File.exists?(path)
 
         require 'fileutils'
         FileUtils.copy_entry(File.expand_path('../template', __FILE__), path)
-        stdout.puts "created #{path}"
+        stdout.puts "Created '#{path}'"
       when 'server'
         path = ARGV.shift
         abort subparser.help unless path
