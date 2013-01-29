@@ -41,6 +41,8 @@ end
 
 
 class MdMenu
+	URI_UNSAFE = /[^\-_.!~*'a-zA-Z\d;\/?:@&=+$,\[\]]/
+
 	DEFAULT_FORMATS = {
 		'markdown'	=> ['txt', 'md', 'markdown'],
 		'textile'	=> ['tt'],
@@ -103,7 +105,7 @@ class MdMenu
 		pattern.gsub!(/^\.\//, '')
 
 		Dir.glob(pattern) { |path|
-			link = @config[:prefix].to_s + (@config[:uri_escape] ? URI.escape(path) : path)
+			link = @config[:prefix].to_s + (@config[:uri_escape] ? URI.escape(path, URI_UNSAFE) : path)
 			@files << {:link => link, :path => path} if ! @links.member?(link)
 		}
 	end
