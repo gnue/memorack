@@ -8,8 +8,8 @@ Gem::Specification.new do |gem|
   gem.version       = MemoRack::VERSION
   gem.authors       = ["gnue"]
   gem.email         = ["gnue@so-kukan.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = %q{Simple Memo Rack Server}
+  gem.summary       = %q{Simple Memo Rack Server}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($/)
