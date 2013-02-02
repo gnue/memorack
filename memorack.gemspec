@@ -17,11 +17,12 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
 
+  gem.required_ruby_version = '>= 1.9.0'
+
   gem.add_dependency('rack')
   gem.add_dependency('tilt')
   gem.add_dependency('mustache')
-  gem.add_dependency('redcarpet')
+  gem.add_dependency('redcarpet', '>= 2.0.0')
   gem.add_dependency('json')
   gem.add_dependency('sass')
-  gem.add_dependency('directory_watcher')
 end
