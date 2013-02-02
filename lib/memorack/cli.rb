@@ -3,7 +3,7 @@ require 'optparse'
 module MemoRack
   class CLI
 
-    def self.execute(stdout, arguments=[])
+    def self.execute(stdout, argv = [])
       options = {theme: 'oreilly'}
       mandatory_options = %w(  )
 
@@ -57,17 +57,17 @@ module MemoRack
                 "Show this help message.") { abort opts.help }
       end
 
-      parser.order!(ARGV)
-      abort parser.help if ARGV.empty?
+      parser.order!(argv)
+      abort parser.help if argv.empty?
 
-      subcmd = ARGV.shift
+      subcmd = argv.shift
       subparser = subparsers[subcmd]
-      subparser.parse!(ARGV)
+      subparser.parse!(argv)
 
       # do stuff
       case subcmd
       when 'create'
-        path = ARGV.shift
+        path = argv.shift
         abort subparser.help unless path
 		abort "File exists '#{path}'" if File.exists?(path)
 
@@ -75,7 +75,7 @@ module MemoRack
         FileUtils.copy_entry(File.expand_path('../template', __FILE__), path)
         stdout.puts "Created '#{path}'"
       when 'server'
-        path = ARGV.shift
+        path = argv.shift
         abort subparser.help unless path
 
         require 'rack/builder'
