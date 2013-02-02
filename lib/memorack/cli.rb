@@ -5,8 +5,15 @@ module MemoRack
 
     def self.execute(stdout, arguments=[])
       cmd = File.basename($0)
-      options = {port: 9292, theme: 'oreilly'}
+      options = {theme: 'oreilly'}
       mandatory_options = %w(  )
+
+      server_options = {
+        :environment => ENV['RACK_ENV'] || 'development',
+        :Port        => 9292,
+        :Host        => '0.0.0.0',
+        :AccessLog   => [],
+      }
 
       parser = OptionParser.new do |opts|
         opts.banner = <<-BANNER.gsub(/^          /,'')
@@ -41,7 +48,7 @@ module MemoRack
         opts.separator ""
         opts.separator "Server options:"
         opts.on("-p", "--port PORT", String,
-                "use PORT (default: #{options[:port]})") { |arg| options[:port] = arg }
+                "use PORT (default: #{server_options[:Port]})") { |arg| server_options[:Port] = arg }
         opts.on("-t", "--theme THEME", String,
                 "use THEME (default: oreilly)") { |arg| options[:theme] = arg }
         opts.on("-h", "--help",
@@ -79,7 +86,9 @@ module MemoRack
             run MemoRack::MemoApp.new(nil, theme: options[:theme], root: path, tmpdir: tmpdir)
           end
         }
-        Rack::Server.new(:app => app, :Port => options[:port]).start
+
+        server_options[:app] = app
+        Rack::Server.new(server_options).start
       else
         abort parser.help
       end
