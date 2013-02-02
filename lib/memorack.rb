@@ -1,8 +1,6 @@
-$:.unshift(File.dirname(__FILE__)) unless
-  $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
+require "memorack/version"
+require 'memorack/memoapp'
 
 module MemoRack
-  VERSION = '0.0.1'
+  # Your code goes here...
 end
-
-require 'memorack/memoapp'
