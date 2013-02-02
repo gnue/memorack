@@ -5,4 +5,4 @@ $:.unshift File.expand_path('../../lib', __FILE__)
 require 'memorack'
 require 'memorack/cli'
 
-MemoRack::CLI.execute(STDOUT, ARGV)
+MemoRack::CLI.execute(ARGV)

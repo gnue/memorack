@@ -3,7 +3,7 @@ require 'optparse'
 module MemoRack
   class CLI
 
-    def self.execute(stdout, argv = [])
+    def self.execute(argv = [])
       options = {theme: 'oreilly'}
       mandatory_options = %w(  )
 
@@ -75,7 +75,7 @@ module MemoRack
 
         require 'fileutils'
         FileUtils.copy_entry(File.expand_path('../template', __FILE__), path)
-        stdout.puts "Created '#{path}'"
+        puts "Created '#{path}'"
       when 'server'
         path = argv.shift
         abort subparser.help unless path
