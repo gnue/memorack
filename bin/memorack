@@ -1,10 +1,8 @@
 #!/usr/bin/env ruby
-#
-#  Created on 2013-1-27.
-#  Copyright (c) 2013. All rights reserved.
 
-require 'rubygems'
-require File.expand_path(File.dirname(__FILE__) + "/../lib/memorack")
-require "memorack/cli"
+$:.unshift File.expand_path('../../lib', __FILE__)
+
+require 'memorack'
+require 'memorack/cli'
 
 MemoRack::CLI.execute(STDOUT, ARGV)
