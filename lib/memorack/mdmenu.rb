@@ -184,7 +184,7 @@ class MdMenu
 			message = "not found"
 		end
 
-		$stderr.print message, "\n" if message
+		$stderr.print message, "\n" if message && @config[:verbose]
 
 		outfile
 	end
@@ -193,7 +193,7 @@ end
 
 if __FILE__ == $0
 	# コマンド引数の解析
-	config = {}
+	config = {:verbose => true}
 
 	OptionParser.new { |opts|
 		opts.banner = "Usage: #{opts.program_name} [-f FILE] [-u] [-e] [--prefix PREFIX] DIRECTORY… "
