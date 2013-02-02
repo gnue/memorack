@@ -4,7 +4,6 @@ module MemoRack
   class CLI
 
     def self.execute(stdout, arguments=[])
-      cmd = File.basename($0)
       options = {theme: 'oreilly'}
       mandatory_options = %w(  )
 
@@ -17,8 +16,8 @@ module MemoRack
 
       parser = OptionParser.new do |opts|
         opts.banner = <<-BANNER.gsub(/^          /,'')
-          Usage: #{cmd} create [options] PATH
-                 #{cmd} server [options] PATH
+          Usage: #{opts.program_name} create [options] PATH
+                 #{opts.program_name} server [options] PATH
         BANNER
 
         opts.separator ""
@@ -29,6 +28,9 @@ module MemoRack
           abort opts.help
         end
       end
+
+      # コマンド名
+      cmd = parser.program_name
 
       # サブコマンドのオプション解析
       subparsers = Hash.new {|h,k| abort "#{cmd}: '#{k}' is not a #{cmd} command. See '#{cmd} --help'" }
