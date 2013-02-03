@@ -273,6 +273,12 @@ module MemoRack
 			}
 		end
 
+		# Tilt に登録されている拡張子を集める
+		def extnames(extname)
+			klass = Tilt[extname]
+			Tilt.mappings.select { |key, value| value.member?(klass) }.collect { |key, value| key }
+		end
+
 		# テンプレート名
 		def self.template_method(name)
 			name.kind_of?(Symbol) && "template_#{name}".to_sym
@@ -296,7 +302,8 @@ module MemoRack
 
 		# メニューを作成
 		template :menu do
-			mdmenu = MdMenu.new({prefix: '/', uri_escape: true})
+			formats = {markdown: extnames('md'), html: ['html', 'htm']}
+			mdmenu = MdMenu.new({prefix: '/', uri_escape: true, formats: formats})
 			Dir.chdir(@root) { |path| mdmenu.collection('.') }
 			mdmenu.generate(StringIO.new).string
 		end

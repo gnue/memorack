@@ -51,20 +51,21 @@ class MdMenu
 		'html'		=> ['html', 'htm']
 	}
 
-	@@extentions = {}
-
-	DEFAULT_FORMATS.each { |name, extentions|
-		extentions.each { |value|
-			@@extentions[value] = name
-		}
-	}
-
 	def initialize(config)
 		@config = config
 		@file = config[:file]
 		@links = analyze(@file)
 		@files = []
-		@extentions = @@extentions.clone
+		@extentions = {}
+
+		regFormats(config[:formats] || DEFAULT_FORMATS)
+	end
+
+	# フォーマット・ハッシュからファイル拡張子を登録する
+	def regFormats(formats)
+		formats.each { |name, extentions|
+			regFormat(name, extentions)
+		}
 	end
 
 	# フォーマットとファイル拡張子を登録する
