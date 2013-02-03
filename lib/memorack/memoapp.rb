@@ -247,10 +247,15 @@ module MemoRack
 				locals[:menu]			||= @menu
 				locals[:content]		||= content
 				locals[:title]			||= @title
-				locals[:page]			||= {}
 
+				locals[:page]			||= {}
 				locals[:page][:title]	||= locals[:title] if template == :index
 				locals[:page][:title]	||= [File.basename(fname), locals[:title]].join(' | ')
+
+				locals[:app]			||= {}
+				locals[:app][:name]		||= MemoRack::name
+				locals[:app][:version]	||= MemoRack::VERSION
+				locals[:app][:url]		||= MemoRack::HOMEPAGE
 
 				render :mustache, 'index.html', {views: @themes}, locals
 			rescue => e

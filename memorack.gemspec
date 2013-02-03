@@ -10,7 +10,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["gnue@so-kukan.com"]
   gem.description   = %q{Simple Memo Rack Server}
   gem.summary       = %q{Simple Memo Rack Server}
-  gem.homepage      = ""
+  gem.homepage      = MemoRack::HOMEPAGE
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
