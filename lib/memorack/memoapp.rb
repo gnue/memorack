@@ -15,6 +15,7 @@ module MemoRack
 			tmpdir:				'tmpdir/',
 			theme:				'default',
 			markdown:			'redcarpet',
+			formats:			['markdown'],
 			css:				nil,
 			directory_watcher:	false,
 
@@ -279,6 +280,25 @@ module MemoRack
 			Tilt.mappings.select { |key, value| value.member?(klass) }.collect { |key, value| key }
 		end
 
+		# 対応フォーマットを取得する
+		def collect_formats
+			unless @collect_formats
+				@collect_formats = {}
+
+				@formats.each { |item|
+					if item.kind_of?(Array)
+						@collect_formats[item.first] = item
+					elsif item.kind_of?(Hash)
+						@collect_formats.merge!(item)
+					else
+						@collect_formats[item] = extnames(item)
+					end
+				}
+			end
+
+			@collect_formats
+		end
+
 		# テンプレート名
 		def self.template_method(name)
 			name.kind_of?(Symbol) && "template_#{name}".to_sym
@@ -302,8 +322,7 @@ module MemoRack
 
 		# メニューを作成
 		template :menu do
-			formats = {markdown: extnames('md'), html: ['html', 'htm']}
-			mdmenu = MdMenu.new({prefix: '/', uri_escape: true, formats: formats})
+			mdmenu = MdMenu.new({prefix: '/', uri_escape: true, formats: collect_formats})
 			Dir.chdir(@root) { |path| mdmenu.collection('.') }
 			mdmenu.generate(StringIO.new).string
 		end

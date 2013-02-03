@@ -1,13 +1,14 @@
 {
-	"directory_watcher":	false,		// ファイルの変更を監視するか決める
-	"css":					"scss",		// scss の自動変換を使用する
-//	"markdown":				"kramdown",	// 使用する markdownライブラリ
+	"directory_watcher":	false,			// ファイルの変更を監視するか決める
+	"css":					"scss",			// scss の自動変換を使用する
+//	"markdown":				"kramdown",		// 使用する markdownライブラリ
+//	"formats":				["markdown"],	// "markdown", "rdoc", "textile" or "wiki" （要 Tilt に対応した gem ライブラリ）
 
 	// redcarpet の拡張構文
-	"strikethrough":		true,		// 例: ~~good~~
-	"fenced_code_blocks":	true,		// 例: ```ruby
-	"superscript":			true,		// 例: 2^10
-//	"autolink":				true,		// 例: http://0.0.0.0/
+	"strikethrough":		true,			// 例: ~~good~~
+	"fenced_code_blocks":	true,			// 例: ```ruby
+	"superscript":			true,			// 例: 2^10
+//	"autolink":				true,			// 例: http://0.0.0.0/
 
 	"title":	"メモ"
 }
