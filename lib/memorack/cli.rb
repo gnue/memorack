@@ -7,21 +7,25 @@ module MemoRack
 			subcmd = nil
 
 			parser = OptionParser.new do |opts|
-				opts.version = MemoRack::VERSION
+				begin
+					opts.version = MemoRack::VERSION
 
-				opts.banner = <<-BANNER.gsub(/^					/,'')
-					Usage: #{opts.program_name} create [options] PATH
-					       #{opts.program_name} server [options] PATH
-				BANNER
+					opts.banner = <<-BANNER.gsub(/^					/,'')
+						Usage: #{opts.program_name} create [options] PATH
+						       #{opts.program_name} server [options] PATH
+					BANNER
 
-				opts.separator ""
-				opts.on("-h", "--help", "Show this help message.") { abort opts.help }
+					opts.separator ""
+					opts.on("-h", "--help", "Show this help message.") { abort opts.help }
 
-				opts.order!(argv)
+					opts.order!(argv)
 
-				subcmd = argv.shift
-				abort opts.help unless subcmd
-				abort opts.help unless self.has_action?(subcmd)
+					subcmd = argv.shift
+					abort opts.help unless subcmd
+					abort opts.help unless self.has_action?(subcmd)
+				rescue => e
+					abort e.to_s
+				end
 			end
 
 			cli = self.new
@@ -52,13 +56,17 @@ module MemoRack
 
 			# オプション解析
 			OptionParser.new do |opts|
-				opts.banner = banner(opts, __method__, '[options] PATH')
-				opts.on("-h", "--help", "Show this help message.") { abort opts.help }
+				begin
+					opts.banner = banner(opts, __method__, '[options] PATH')
+					opts.on("-h", "--help", "Show this help message.") { abort opts.help }
 
-				opts.order!(args)
+					opts.order!(args)
 
-				path = args.shift
-				abort opts.help unless path
+					path = args.shift
+					abort opts.help unless path
+				rescue => e
+					abort e.to_s
+				end
 			end
 
 			abort "File exists '#{path}'" if File.exists?(path)
@@ -82,19 +90,23 @@ module MemoRack
 
 			# オプション解析
 			OptionParser.new do |opts|
-				opts.banner = banner(opts, __method__, '[options] PATH')
+				begin
+					opts.banner = banner(opts, __method__, '[options] PATH')
 
-				opts.separator ""
-				opts.on("-p", "--port PORT", String,
-						"use PORT (default: #{server_options[:Port]})") { |arg| server_options[:Port] = arg }
-				opts.on("-t", "--theme THEME", String,
-						"use THEME (default: oreilly)") { |arg| options[:theme] = arg }
-				opts.on("-h", "--help", "Show this help message.") { abort opts.help }
+					opts.separator ""
+					opts.on("-p", "--port PORT", String,
+							"use PORT (default: #{server_options[:Port]})") { |arg| server_options[:Port] = arg }
+					opts.on("-t", "--theme THEME", String,
+							"use THEME (default: oreilly)") { |arg| options[:theme] = arg }
+					opts.on("-h", "--help", "Show this help message.") { abort opts.help }
 
-				opts.order!(args)
+					opts.order!(args)
 
-				path = args.shift
-				abort opts.help unless path
+					path = args.shift
+					abort opts.help unless path
+				rescue => e
+					abort e.to_s
+				end
 			end
 
 			# サーバーの起動
