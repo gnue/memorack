@@ -39,6 +39,12 @@ module MemoRack
 			send "memorack_#{command}", *args
 		end
 
+		# サブコマンド・オプションのバナー作成
+		def banner(opts, method, *args)
+			subcmd = method.to_s.gsub(/^.+_/, '')
+			["Usage: #{opts.program_name} #{subcmd}", *args].join(' ')
+		end
+
 		# テンプレートの作成
 		def memorack_create(*args)
 			options = {}
@@ -46,7 +52,7 @@ module MemoRack
 
 			# オプション解析
 			OptionParser.new do |opts|
-				opts.banner = "Usage: #{opts.program_name} create [options] PATH"
+				opts.banner = banner(opts, __method__, '[options] PATH')
 				opts.on("-h", "--help", "Show this help message.") { abort opts.help }
 
 				opts.order!(args)
@@ -76,10 +82,9 @@ module MemoRack
 
 			# オプション解析
 			OptionParser.new do |opts|
-				opts.banner = "Usage: #{opts.program_name} server [options] PATH"
+				opts.banner = banner(opts, __method__, '[options] PATH')
 
 				opts.separator ""
-				opts.separator "Server options:"
 				opts.on("-p", "--port PORT", String,
 						"use PORT (default: #{server_options[:Port]})") { |arg| server_options[:Port] = arg }
 				opts.on("-t", "--theme THEME", String,
