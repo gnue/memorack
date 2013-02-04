@@ -40,6 +40,8 @@ if RUBY_VERSION >= '1.9.0'
 end
 
 
+module MemoRack
+
 class MdMenu
 	URI_UNSAFE = /[^\-_.!~*'a-zA-Z\d;\/?:@&=+$,\[\]]/
 
@@ -191,6 +193,8 @@ class MdMenu
 	end
 end
 
+end
+
 
 if __FILE__ == $0
 	# コマンド引数の解析
@@ -209,7 +213,7 @@ if __FILE__ == $0
 
 	ARGV.push '.' if ARGV.length == 0
 
-	mdmenu = MdMenu.new(config)
+	mdmenu = MemoRack::MdMenu.new(config)
 
 	ARGV.each { |dir| mdmenu.collection(dir) }
 	mdmenu.generate
