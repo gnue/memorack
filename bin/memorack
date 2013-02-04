@@ -6,4 +6,4 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'memorack'
 require 'memorack/cli'
 
-MemoRack::CLI.execute(ARGV)
+MemoRack::CLI.run
