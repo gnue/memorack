@@ -60,7 +60,7 @@ module MemoRack
 					opts.banner = banner(opts, __method__, '[options] PATH')
 					opts.on("-h", "--help", "Show this help message.") { abort opts.help }
 
-					opts.order!(args)
+					opts.parse!(args)
 
 					path = args.shift
 					abort opts.help unless path
@@ -100,7 +100,7 @@ module MemoRack
 							"use THEME (default: oreilly)") { |arg| options[:theme] = arg }
 					opts.on("-h", "--help", "Show this help message.") { abort opts.help }
 
-					opts.order!(args)
+					opts.parse!(args)
 
 					path = args.shift
 					abort opts.help unless path
