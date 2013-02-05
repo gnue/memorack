@@ -246,8 +246,8 @@ module MemoRack
 
 				locals = @locals.merge(locals)
 
-				locals[:menu]			||= @menu
-				locals[:content]		||= content
+				locals[:__menu__]		||= @menu
+				locals[:__content__]	||= content
 				locals[:title]			||= @title
 
 				locals[:page]			||= {}
