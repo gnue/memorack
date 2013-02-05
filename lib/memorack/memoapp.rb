@@ -46,7 +46,7 @@ module MemoRack
 				@options.delete(key)
 			}
 
-			@locals = @options.dup
+			@locals = default_locals(@options)
 
 			use_engine(@markdown)
 			define_statics(@root, *@themes)
@@ -123,6 +123,23 @@ module MemoRack
 			}
 
 			nil
+		end
+
+		# デフォルトの locals を生成する
+		def default_locals(locals = {})
+			locals = locals.dup
+
+			locals[:title]			||= @title
+
+			locals[:page]			||= {}
+			locals[:page][:title]	||= @title
+
+			locals[:app]			||= {}
+			locals[:app][:name]		||= MemoRack::name
+			locals[:app][:version]	||= MemoRack::VERSION
+			locals[:app][:url]		||= MemoRack::HOMEPAGE
+
+			locals
 		end
 
 		# 設定ファイルを読込む
@@ -246,18 +263,9 @@ module MemoRack
 
 				locals = @locals.merge(locals)
 
-				locals[:__menu__]		||= @menu
-				locals[:__content__]	||= content
-				locals[:title]			||= @title
-
-				locals[:page]			||= {}
-				locals[:page][:title]	||= locals[:title] if template == :index
-				locals[:page][:title]	||= [File.basename(fname), locals[:title]].join(' | ')
-
-				locals[:app]			||= {}
-				locals[:app][:name]		||= MemoRack::name
-				locals[:app][:version]	||= MemoRack::VERSION
-				locals[:app][:url]		||= MemoRack::HOMEPAGE
+				locals[:__menu__]		= @menu
+				locals[:__content__]	= content
+				locals[:page][:title]	= [File.basename(fname), locals[:title]].join(' | ') unless template == :index
 
 				render :mustache, 'index.html', {views: @themes}, locals
 			rescue => e
