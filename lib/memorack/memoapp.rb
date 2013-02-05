@@ -17,9 +17,7 @@ module MemoRack
 			markdown:			'redcarpet',
 			formats:			['markdown'],
 			css:				nil,
-			directory_watcher:	false,
-
-			title:				'memo'
+			directory_watcher:	false
 		}
 
 		# テンプレートエンジンのオプション
@@ -27,7 +25,12 @@ module MemoRack
 			tables:			true
 		}
 
-		DEFAULT_OPTIONS = DEFAULT_APP_OPTIONS.merge(DEFAULT_TEMPLATE_OPTIONS)
+		# テンプレートで使用するローカル変数の初期値
+		DEFAULT_LOCALS = {
+			title:				'memo'
+		}
+
+		DEFAULT_OPTIONS = DEFAULT_APP_OPTIONS.merge(DEFAULT_TEMPLATE_OPTIONS).merge(DEFAULT_LOCALS)
 
 		def initialize(app, options={})
 			options = DEFAULT_OPTIONS.merge(to_sym_keys(options))
@@ -129,10 +132,8 @@ module MemoRack
 		def default_locals(locals = {})
 			locals = locals.dup
 
-			locals[:title]			||= @title
-
 			locals[:page]			||= {}
-			locals[:page][:title]	||= @title
+			locals[:page][:title]	||= locals[:title]
 
 			locals[:app]			||= {}
 			locals[:app][:name]		||= MemoRack::name
