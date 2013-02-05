@@ -46,6 +46,8 @@ module MemoRack
 				@options.delete(key)
 			}
 
+			@locals = @options.dup
+
 			use_engine(@markdown)
 			define_statics(@root, *@themes)
 
@@ -242,7 +244,7 @@ module MemoRack
 				content = render engine, template, options
 				fname = template.to_s.force_encoding('UTF-8')
 
-				locals = locals.dup
+				locals = @locals.merge(locals)
 
 				locals[:menu]			||= @menu
 				locals[:content]		||= content
