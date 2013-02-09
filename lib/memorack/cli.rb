@@ -10,7 +10,7 @@ module MemoRack
 				begin
 					opts.version = MemoRack::VERSION
 
-					opts.banner = <<-BANNER.gsub(/^					/,'')
+					opts.banner = <<-BANNER.gsub(/^\t+/,'')
 						Usage: #{opts.program_name} create [options] PATH
 						       #{opts.program_name} server [options] PATH
 					BANNER
