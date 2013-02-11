@@ -8,7 +8,7 @@ module MemoRack
 
 			parser = OptionParser.new do |opts|
 				begin
-					opts.version = MemoRack::VERSION
+					opts.version = LONG_VERSION || VERSION
 
 					opts.banner = <<-BANNER.gsub(/^\t+/,'')
 						Usage: #{opts.program_name} create [options] PATH
