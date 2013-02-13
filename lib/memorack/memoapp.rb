@@ -10,7 +10,7 @@ require 'memorack/mdmenu'
 module MemoRack
 	class MemoApp
 		DEFAULT_APP_OPTIONS = {
-			root:				'views/',
+			root:				'content/',
 			themes_folder:		'themes/',
 			tmpdir:				'tmpdir/',
 			theme:				'default',
