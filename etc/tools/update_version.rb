@@ -4,6 +4,7 @@ def update_version(path)
 
 	begin
 		return if version == open(path).read.chomp
+		return if version.empty?
 	rescue
 	end
 
