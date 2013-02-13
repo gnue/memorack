@@ -26,20 +26,6 @@ require 'optparse'
 require 'uri'
 
 
-# ruby 1.9系対応
-if RUBY_VERSION >= '1.9.0'
-	class << File
-		alias :join_without_for_encoding_filter :join
-
-		def join_with_for_encoding_filter(*args)
-			join_without_for_encoding_filter(*args).force_encoding(Encoding.default_external)
-		end
-
-		alias :join :join_with_for_encoding_filter
-	end
-end
-
-
 module MemoRack
 
 class MdMenu
