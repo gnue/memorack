@@ -19,6 +19,8 @@ Or install it yourself as:
 ## Usage
 
 	$ memorack create PATH				# Generate template folder
+	$ memorack theme					# Show theme list
+	$ memorack theme -c THEME			# Copy theme
 	$ memorack server PATH				# Instant Server
 
 Standard startup
