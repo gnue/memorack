@@ -1,27 +1,6 @@
 #!/usr/bin/env ruby
 # -*- encoding: utf-8 -*-
 
-=begin
-
-= 
-
-Authors::   GNUE(鵺)
-Version::   1.0 2011-10-25 gnue
-Copyright:: Copyright (C) gnue, 2011. All rights reserved.
-License::   MIT ライセンスに準拠
-
-
-== 使い方
-
-
-== 開発履歴
-
-* 1.0 2011-10-25
-  * とりあえず作ってみた
-
-=end
-
-
 require 'optparse'
 require 'uri'
 
