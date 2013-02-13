@@ -1,6 +1,6 @@
-# Memorack
+# MemoRack
 
-TODO: Write a gem description
+Rack Application for markdown memo
 
 ## Installation
 
@@ -18,7 +18,53 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+	$ memorack create PATH				# Generate template folder
+	$ memorack server PATH				# Instant Server
+
+Standard startup
+
+	$ memorack create memo
+	$ cd memo
+	(Customizing...)
+	$ rackup
+
+Instant server
+
+	$ mkdir content
+	$ echo '# Hello World' > content/hello.md
+	(Customizing...)
+	$ memorack server content
+
+OS X (Pow + powder)
+
+	$ memorack create memo
+	$ cd memo
+	(Customizing...)
+	$ powder link
+	$ open http://memo.dev/
+
+* [Pow: Zero-configuration Rack server for Mac OS X](http://pow.cx)
+* `gem install powder`
+
+## Directory
+
+Template
+
+	.
+	├── .gitignore					-- for git
+	├── .powenv						-- for pow + rbenv
+	├── Gemfile						-- `bundle install`
+	├── config.ru					-- for rack application
+	├── content						-- Content directory for memo
+	│   └── README.md				-- Sample file(remove it)
+	└── themes
+	    └── custom					-- Default theme
+	        ├── config.json			-- Configuration
+	        └── index.md			-- Description(Show by top page)
+
+## TODO
+
+* Test program
 
 ## Contributing
 
