@@ -25,4 +25,5 @@ Gem::Specification.new do |gem|
   gem.add_dependency('redcarpet', '>= 2.0.0')
   gem.add_dependency('json')
   gem.add_dependency('sass')
+  gem.add_dependency('i18n')
 end

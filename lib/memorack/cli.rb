@@ -1,10 +1,19 @@
+# -*- encoding: utf-8 -*-
+
 require 'optparse'
+require 'rubygems'
+require 'i18n'
+
 
 module MemoRack
 	class CLI
 
 		def self.run(argv = ARGV, options = {})
 			CLI.new.run(argv, options)
+		end
+
+		def initialize
+			i18n_init
 		end
 
 		def run(argv = ARGV, options = {})
@@ -20,7 +29,7 @@ module MemoRack
 					BANNER
 
 					opts.separator ""
-					opts.on("-h", "--help", "Show this help message.") { abort opts.help }
+					opts.on("-h", "--help", t(:help)) { abort opts.help }
 
 					opts.order!(argv)
 
@@ -33,6 +42,21 @@ module MemoRack
 			end
 
 			action(subcmd, *argv)
+		end
+
+		# I18n を初期化する
+		def i18n_init
+			I18n.load_path = Dir[File.expand_path('../locales/*.yml', __FILE__)]
+			I18n.backend.load_translations
+
+			locale = ENV['LANG'][0, 2].to_sym if ENV['LANG']
+			I18n.locale = locale if I18n.available_locales.include?(locale)
+		end
+
+		# I18n で翻訳する
+		def t(code, options = {})
+			options[:scope] ||= [:usage]
+			I18n.t(code, options)
 		end
 
 		# サブコマンドが定義されているか？
@@ -61,7 +85,7 @@ module MemoRack
 			OptionParser.new do |opts|
 				begin
 					opts.banner = banner(opts, __method__, '[options] PATH')
-					opts.on("-h", "--help", "Show this help message.") { abort opts.help }
+					opts.on("-h", "--help", t(:help)) { abort opts.help }
 
 					opts.parse!(args)
 
@@ -98,10 +122,10 @@ module MemoRack
 
 					opts.separator ""
 					opts.on("-p", "--port PORT", String,
-							"use PORT (default: #{server_options[:Port]})") { |arg| server_options[:Port] = arg }
+							sprintf(t(:port), server_options[:Port])) { |arg| server_options[:Port] = arg }
 					opts.on("-t", "--theme THEME", String,
-							"use THEME (default: oreilly)") { |arg| options[:theme] = arg }
-					opts.on("-h", "--help", "Show this help message.") { abort opts.help }
+							sprintf(t(:theme), options[:theme])) { |arg| options[:theme] = arg }
+					opts.on("-h", "--help", t(:help)) { abort opts.help }
 
 					opts.parse!(args)
 
