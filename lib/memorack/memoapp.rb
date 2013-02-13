@@ -13,7 +13,7 @@ module MemoRack
 			root:				'content/',
 			themes_folder:		'themes/',
 			tmpdir:				'tmp/',
-			theme:				'default',
+			theme:				'basic',
 			markdown:			'redcarpet',
 			formats:			['markdown'],
 			css:				nil,

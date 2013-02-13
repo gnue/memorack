@@ -1,6 +1,6 @@
 {
 //	"directory_watcher":	true,			// ファイルの変更を監視するか決める
-	"theme":				"oreilly",		// テーマ（省略すると default ）
+	"theme":				"oreilly",		// テーマ（省略すると basic ）
 //	"markdown":				"kramdown",		// 使用する markdownライブラリ（省略すると redcarpet ）
 //	"formats":				["markdown"],	// "markdown", "rdoc", "textile" or "wiki" （要 Tilt に対応した gem ライブラリ）
 
