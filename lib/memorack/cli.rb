@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 require 'optparse'
+require 'fileutils'
 require 'rubygems'
 require 'i18n'
 
@@ -25,6 +26,7 @@ module MemoRack
 
 					opts.banner = <<-BANNER.gsub(/^\t+/,'')
 						Usage: #{opts.program_name} create [options] PATH
+						       #{opts.program_name} theme  [options] [THEME]
 						       #{opts.program_name} server [options] PATH
 					BANNER
 
@@ -57,6 +59,18 @@ module MemoRack
 		def t(code, options = {})
 			options[:scope] ||= [:usage]
 			I18n.t(code, options)
+		end
+
+		# テーマ一覧を表示する
+		def show_themes(domain, themes)
+			return unless File.directory?(themes)
+
+			puts "#{domain}:"
+
+			Dir.foreach(themes) { |file|
+				next if /^\./ =~ file
+				puts "  #{file}"
+			}
 		end
 
 		# サブコマンドが定義されているか？
@@ -109,6 +123,14 @@ module MemoRack
 			abort opts.help if argv.empty?
 		}
 
+		# テーマ関連の操作
+		define_options(:theme, '[options] [THEME]') { |opts, argv, options|
+			opts.on("-c", "--copy", t(:copy)) { options[:copy] = true }
+			opts.on("-h", "--help", t(:help)) { abort opts.help }
+
+			opts.parse!(argv)
+		}
+
 		# サーバーの実行
 		define_options(:server, '[options] PATH') { |opts, argv, options|
 			default_options = {
@@ -135,6 +157,7 @@ module MemoRack
 			abort opts.help if argv.empty?
 		}
 
+
 		# サブコマンド
 
 		# テンプレートの作成
@@ -142,9 +165,32 @@ module MemoRack
 			path = argv.shift
 			abort "File exists '#{path}'" if File.exists?(path)
 
-			require 'fileutils'
 			FileUtils.copy_entry(File.expand_path('../template', __FILE__), path)
 			puts "Created '#{path}'"
+		end
+
+		# テーマ関連の操作
+		def memorack_theme(options, *argv)
+			theme = argv.shift
+
+			themes = File.expand_path("../themes", __FILE__)
+
+			if theme
+				from = File.join(themes, theme)
+				"Theme not exists '#{theme}'" unless File.directory?(from)
+
+				dir = 'themes'
+
+				if options[:copy]
+					path = File.directory?(dir) ? File.join(dir, theme) : theme
+					FileUtils.copy_entry(from, path)
+					puts "Created '#{path}'"
+				else
+				end
+			else
+				show_themes('MemoRack', themes)
+				show_themes('User', 'themes')
+			end
 		end
 
 		# サーバーの実行
