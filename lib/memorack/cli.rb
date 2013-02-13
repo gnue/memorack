@@ -3,7 +3,11 @@ require 'optparse'
 module MemoRack
 	class CLI
 
-		def self.run(argv = ARGV)
+		def self.run(argv = ARGV, options = {})
+			CLI.new.run(argv, options)
+		end
+
+		def run(argv = ARGV, options = {})
 			subcmd = nil
 
 			parser = OptionParser.new do |opts|
@@ -22,19 +26,18 @@ module MemoRack
 
 					subcmd = argv.shift
 					abort opts.help unless subcmd
-					abort opts.help unless self.has_action?(subcmd)
+					abort opts.help unless has_action?(subcmd)
 				rescue => e
 					abort e.to_s
 				end
 			end
 
-			cli = self.new
-			cli.action(subcmd, *argv)
+			action(subcmd, *argv)
 		end
 
 		# サブコマンドが定義されているか？
-		def self.has_action?(command)
-			method_defined? "memorack_#{command}"
+		def has_action?(command)
+			respond_to? "memorack_#{command}"
 		end
 
 		# サブコマンドの実行
