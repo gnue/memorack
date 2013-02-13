@@ -12,7 +12,7 @@ module MemoRack
 		DEFAULT_APP_OPTIONS = {
 			root:				'content/',
 			themes_folder:		'themes/',
-			tmpdir:				'tmpdir/',
+			tmpdir:				'tmp/',
 			theme:				'default',
 			markdown:			'redcarpet',
 			formats:			['markdown'],
