@@ -19,6 +19,7 @@ Gem::Specification.new do |gem|
 
   gem.required_ruby_version = '>= 1.9.0'
 
+  # dependency
   gem.add_dependency('rack')
   gem.add_dependency('tilt')
   gem.add_dependency('mustache')
@@ -26,4 +27,8 @@ Gem::Specification.new do |gem|
   gem.add_dependency('json')
   gem.add_dependency('sass')
   gem.add_dependency('i18n')
+
+  # for development
+  gem.add_development_dependency('minitest')
+  gem.add_development_dependency('turn')
 end
