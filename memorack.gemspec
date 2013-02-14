@@ -31,4 +31,15 @@ Gem::Specification.new do |gem|
   # for development
   gem.add_development_dependency('minitest')
   gem.add_development_dependency('turn')
+
+  gem.post_install_message = %Q{
+    ==================
+    Quick Start
+
+      $ memorack create memo
+      $ cd memo
+      $ rackup
+
+    ==================
+  }
 end
