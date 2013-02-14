@@ -53,7 +53,83 @@ describe MemoRack do
 	end
 
 	describe "theme" do
-		it "theme"
+		it "theme" do
+			proc { memorack 'theme' }.must_output <<-EOD.gsub(/^\t+/,'')
+				MemoRack:
+				  basic
+				  oreilly
+			EOD
+		end
+
+		it "theme(with user)" do
+			name = 'memo'
+
+			Dir.chdir(@tmpdir) {
+				proc { memorack 'create', name }.must_output "Created '#{name}'\n"
+
+				Dir.chdir(name) {
+					proc { memorack 'theme' }.must_output <<-EOD.gsub(/^\t+/,'')
+						MemoRack:
+						  basic
+						  oreilly
+						User:
+						  custom
+					EOD
+				}
+			}
+		end
+
+		it "theme THEME" do
+			name = 'memo'
+
+			Dir.chdir(@tmpdir) {
+				proc { memorack 'create', name }.must_output "Created '#{name}'\n"
+
+				Dir.chdir(name) {
+					proc { memorack 'theme', 'custom' }.must_output <<-EOD.gsub(/^\t+/,'')
+						custom --> [oreilly] --> [basic]
+						  config.json
+						  index.md
+					EOD
+				}
+			}
+		end
+
+		it "theme -c THEME" do
+			name = 'memo'
+			theme = 'basic'
+
+			Dir.chdir(@tmpdir) {
+				proc { memorack 'create', name }.must_output "Created '#{name}'\n"
+
+				Dir.chdir(name) {
+					proc { memorack 'theme', '-c', theme }.must_output "Created 'themes/#{theme}'\n"
+
+					`cd themes/#{theme}; find . -print`.must_equal <<-EOD.gsub(/^\t+/,'')
+						.
+						./2-column.scss
+						./basic-styles.scss
+						./config.json
+						./index.html
+						./styles.scss
+					EOD
+				}
+			}
+		end
+
+		it "theme -c THEME/index.html" do
+			name = 'memo'
+			theme = 'basic'
+			fname = 'index.html'
+
+			Dir.chdir(@tmpdir) {
+				proc { memorack 'create', name }.must_output "Created '#{name}'\n"
+
+				Dir.chdir(name) {
+					proc { memorack 'theme', '-c', File.join(theme, fname) }.must_output "Created '#{fname}'\n"
+				}
+			}
+		end
 	end
 
 	describe "server" do
