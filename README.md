@@ -65,6 +65,33 @@ Template
 	        ├── config.json			-- Configuration
 	        └── index.md			-- Description(Show by top page)
 
+## Customizing
+
+### Layout
+
+`index.html` is mustache template
+
+	$ cd themes/custom
+	$ memorack theme -c basic/index.html
+	Created 'index.html'
+	(Edit 'index.html'...)
+
+#### mustache variables
+
+Basic variables -- `{{VAR}}`
+
+* `title`
+* `page.title`
+* `app.name`
+* `app.version`
+* `app.url`
+* other variable in config.json
+
+Special variables -- `{{{VAR}}}`
+
+* `__menu__`
+* `__content__`
+
 ## TODO
 
 * Test program
