@@ -56,9 +56,11 @@ module MemoRack
 		end
 
 		# I18n で翻訳する
-		def t(code, options = {})
+		def t(code, locals = nil, options = {})
 			options[:scope] ||= [:usage]
-			I18n.t(code, options)
+			text = I18n.t(code, options)
+			text = sprintf(text, locals[code], options) if locals
+			text
 		end
 
 		# テーマ一覧を表示する
@@ -131,7 +133,7 @@ module MemoRack
 
 			opts.separator ""
 			opts.on("-c", "--copy", t(:copy)) { options[:copy] = true }
-			opts.on("-d", "--dir DIR", sprintf(t(:dir), options[:dir])) { |arg| options[:dir] = arg }
+			opts.on("-d", "--dir DIR", t(:dir, options)) { |arg| options[:dir] = arg }
 			opts.on("-h", "--help", t(:help)) { abort opts.help }
 
 			opts.parse!(argv)
@@ -153,10 +155,8 @@ module MemoRack
 			options.merge!(default_options)
 
 			opts.separator ""
-			opts.on("-p", "--port PORT", String,
-					sprintf(t(:port), options[:server][:Port])) { |arg| options[:server][:Port] = arg }
-			opts.on("-t", "--theme THEME", String,
-					sprintf(t(:theme), options[:theme])) { |arg| options[:theme] = arg }
+			opts.on("-p", "--port PORT", String, t(:port, options)) { |arg| options[:server][:Port] = arg }
+			opts.on("-t", "--theme THEME", String, t(:theme, options)) { |arg| options[:theme] = arg }
 			opts.on("-h", "--help", t(:help)) { abort opts.help }
 
 			opts.parse!(argv)
