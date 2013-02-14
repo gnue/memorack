@@ -94,7 +94,10 @@ Special variables -- `{{{VAR}}}`
 
 ## TODO
 
+* Template comments translate english
+* Add customizing tips
 * Test program
+* Abstraction of URI
 
 ## Contributing
 
