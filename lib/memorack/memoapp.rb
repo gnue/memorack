@@ -9,6 +9,8 @@ require 'memorack/mdmenu'
 
 module MemoRack
 	class MemoApp
+		attr_reader :theme_chain, :options_chain
+
 		DEFAULT_APP_OPTIONS = {
 			root:				'content/',
 			themes_folder:		'themes/',
@@ -146,7 +148,8 @@ module MemoRack
 		# 設定ファイルを読込む
 		def read_config(theme, options = {})
 			@themes ||= []
-			options_chain = []
+			@options_chain = []
+			@theme_chain = []
 
 			begin
 				require 'json'
@@ -164,15 +167,16 @@ module MemoRack
 					break unless File.readable?(path)
 
 					data = File.read(path)
-					options_chain << to_sym_keys(JSON.parse(data))
+					@options_chain << to_sym_keys(JSON.parse(data))
+					@theme_chain << path
 
-					theme = options_chain.last[:theme]
+					theme = @options_chain.last[:theme]
 				end
 			rescue
 			end
 
 			# オプションをマージ
-			options_chain.reverse.each { |opts| options.merge!(opts) }
+			@options_chain.reverse.each { |opts| options.merge!(opts) }
 			options
 		end
 

@@ -182,12 +182,25 @@ module MemoRack
 				dir = 'themes'
 
 				if options[:copy]
+					# テーマをコピー
 					path = File.directory?(dir) ? File.join(dir, theme) : theme
 					FileUtils.copy_entry(from, path)
 					puts "Created '#{path}'"
 				else
+					# テーマの情報（継承関係）を表示
+					app = MemoRack::MemoApp.new(nil, theme: theme, root: dir)
+
+					theme_chain = app.theme_chain.collect { |path|
+						theme_path = File.dirname(path)
+						name = File.basename(theme_path)
+
+						File.dirname(theme_path) == themes ? "[#{name}]" : name
+					}
+
+					puts theme_chain.join(' --> ')
 				end
 			else
+				# テーマ一覧を表示
 				show_themes('MemoRack', themes)
 				show_themes('User', 'themes')
 			end
