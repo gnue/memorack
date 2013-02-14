@@ -195,11 +195,9 @@ module MemoRack
 					# テーマの情報（継承関係）を表示
 					app = MemoRack::MemoApp.new(nil, theme: theme, root: dir)
 
-					theme_chain = app.theme_chain.collect { |path|
-						theme_path = File.dirname(path)
-						name = File.basename(theme_path)
-
-						File.dirname(theme_path) == themes ? "[#{name}]" : name
+					theme_chain = app.themes.collect { |path|
+						name = File.basename(path)
+						File.dirname(path) == themes ? "[#{name}]" : name
 					}
 
 					puts theme_chain.join(' --> ')

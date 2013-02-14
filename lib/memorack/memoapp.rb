@@ -9,7 +9,7 @@ require 'memorack/mdmenu'
 
 module MemoRack
 	class MemoApp
-		attr_reader :theme_chain, :options_chain
+		attr_reader :themes, :options_chain
 
 		DEFAULT_APP_OPTIONS = {
 			root:				'content/',
@@ -168,7 +168,6 @@ module MemoRack
 
 					data = File.read(path)
 					@options_chain << to_sym_keys(JSON.parse(data))
-					@theme_chain << path
 
 					theme = @options_chain.last[:theme]
 				end
