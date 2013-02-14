@@ -21,7 +21,35 @@ describe MemoRack do
 	end
 
 	describe "create" do
-		it "create"
+		it "create" do
+			name = 'memo'
+
+			Dir.chdir(@tmpdir) {
+				proc { memorack 'create', name }.must_output "Created '#{name}'\n"
+				`cd #{name}; find . -print`.must_equal <<-EOD.gsub(/^\t+/,'')
+					.
+					./.gitignore
+					./.powenv
+					./config.ru
+					./content
+					./content/README.md
+					./Gemfile
+					./themes
+					./themes/custom
+					./themes/custom/config.json
+					./themes/custom/index.md
+				EOD
+			}
+		end
+
+		it "create(File exists)" do
+			name = 'memo'
+
+			Dir.chdir(@tmpdir) {
+				Dir.mkdir name
+				proc { memorack 'create', name }.must_output nil, "File exists '#{name}'\n"
+			}
+		end
 	end
 
 	describe "theme" do
