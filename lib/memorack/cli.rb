@@ -61,6 +61,17 @@ module MemoRack
 			sprintf(I18n.t(code, options), locals)
 		end
 
+		# ディレクトリを繰返す
+		def dir_earch(dir, match = '**/*', flag = File::FNM_DOTMATCH)
+			Dir.chdir(dir) { |d|
+				Dir.glob(match, flag).each { |file|
+					next if File.basename(file) =~ /^[.]{1,2}$/
+					file = File.join(file, '') if File.directory?(file)
+					yield(file)
+				}
+			}
+		end
+
 		# テーマ一覧を表示する
 		def show_themes(domain, themes)
 			return unless File.directory?(themes)
@@ -192,15 +203,21 @@ module MemoRack
 					FileUtils.copy_entry(from, path)
 					puts "Created '#{path}'"
 				else
-					# テーマの情報（継承関係）を表示
+					# テーマの情報を表示
 					app = MemoRack::MemoApp.new(nil, theme: theme, root: dir)
 
+					# 継承関係の表示
 					theme_chain = app.themes.collect { |path|
 						name = File.basename(path)
 						File.dirname(path) == themes ? "[#{name}]" : name
 					}
 
 					puts theme_chain.join(' --> ')
+
+					# ファイル一覧の表示
+					dir_earch(app.themes.first) { |file|
+						puts "  #{file}"
+					}
 				end
 			else
 				# テーマ一覧を表示
