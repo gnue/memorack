@@ -96,7 +96,7 @@ Special variables -- `{{{VAR}}}`
 
 * Template comments translate english
 * Add customizing tips
-* Test program
+* Server test program
 * Abstraction of URI
 
 ## Contributing
