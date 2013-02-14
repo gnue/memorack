@@ -125,7 +125,13 @@ module MemoRack
 
 		# テーマ関連の操作
 		define_options(:theme, '[options] [THEME]') { |opts, argv, options|
+			default_options = {dir: 'themes'}
+
+			options.merge!(default_options)
+
+			opts.separator ""
 			opts.on("-c", "--copy", t(:copy)) { options[:copy] = true }
+			opts.on("-d", "--dir DIR", sprintf(t(:dir), options[:dir])) { |arg| options[:dir] = arg }
 			opts.on("-h", "--help", t(:help)) { abort opts.help }
 
 			opts.parse!(argv)
@@ -174,12 +180,11 @@ module MemoRack
 			theme = argv.shift
 
 			themes = File.expand_path("../themes", __FILE__)
+			dir = options[:dir]
 
 			if theme
 				from = File.join(themes, theme)
 				"Theme not exists '#{theme}'" unless File.directory?(from)
-
-				dir = 'themes'
 
 				if options[:copy]
 					# テーマをコピー
@@ -202,7 +207,7 @@ module MemoRack
 			else
 				# テーマ一覧を表示
 				show_themes('MemoRack', themes)
-				show_themes('User', 'themes')
+				show_themes('User', dir)
 			end
 		end
 

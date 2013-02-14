@@ -2,5 +2,6 @@ en:
   usage:
     help:  Show this message
     copy:  Copy theme
+    dir:   "Theme directory (default: %s)"
     port:  "use PORT (default: %s)"
     theme: "use THEME (default: %s)"
