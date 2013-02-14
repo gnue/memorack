@@ -6,6 +6,20 @@ require 'memorack/cli'
 
 
 describe MemoRack do
+	class String
+		# １行目のインデントだけ全体のインデントを削除する
+		def cut_indent(prefix = '')
+			prefix = Regexp.escape(prefix)
+
+			if self =~ /^(\s+#{prefix})/
+				indent = Regexp.escape($1)
+				self.gsub(/^#{indent}/,'')
+			else
+				self
+			end
+		end
+	end
+
 	# MemoRack::CLI.run を呼出す
 	def memorack(*argv)
 		program_name = $0
@@ -43,7 +57,7 @@ describe MemoRack do
 			end
 
 			it "usage" do
-				proc { memorack '-h' }.must_output nil, <<-EOD.gsub(/^\t+/,'')
+				proc { memorack '-h' }.must_output nil, <<-EOD.cut_indent
 					Usage: memorack create [options] PATH
 					       memorack theme  [options] [THEME]
 					       memorack server [options] PATH
@@ -53,14 +67,14 @@ describe MemoRack do
 			end
 
 			it "create" do
-				proc { memorack 'create', '-h' }.must_output nil, <<-EOD.gsub(/^\t+/,'')
+				proc { memorack 'create', '-h' }.must_output nil, <<-EOD.cut_indent
 					Usage: memorack create [options] PATH
 					    -h, --help                       Show this message
 				EOD
 			end
 
 			it "theme" do
-				proc { memorack 'theme', '-h' }.must_output nil, <<-EOD.gsub(/^\t+/,'')
+				proc { memorack 'theme', '-h' }.must_output nil, <<-EOD.cut_indent
 					Usage: memorack theme [options] [THEME]
 
 					    -c, --copy                       Copy theme
@@ -70,7 +84,7 @@ describe MemoRack do
 			end
 
 			it "server" do
-				proc { memorack 'server', '-h' }.must_output nil, <<-EOD.gsub(/^\t+/,'')
+				proc { memorack 'server', '-h' }.must_output nil, <<-EOD.cut_indent
 					Usage: memorack server [options] PATH
 
 					    -p, --port PORT                  use PORT (default: 9292)
@@ -86,7 +100,7 @@ describe MemoRack do
 			end
 
 			it "usage" do
-				proc { memorack '-h' }.must_output nil, <<-EOD.gsub(/^\t+/,'')
+				proc { memorack '-h' }.must_output nil, <<-EOD.cut_indent
 					Usage: memorack create [options] PATH
 					       memorack theme  [options] [THEME]
 					       memorack server [options] PATH
@@ -96,7 +110,7 @@ describe MemoRack do
 			end
 
 			it "create" do
-				proc { memorack 'create', '-h' }.must_output nil, <<-EOD.gsub(/^\t+/,'')
+				proc { memorack 'create', '-h' }.must_output nil, <<-EOD.cut_indent
 					Usage: memorack create [options] PATH
 					    -h, --help                       このメッセージを表示
 				EOD
@@ -104,7 +118,7 @@ describe MemoRack do
 
 
 			it "theme" do
-				proc { memorack 'theme', '-h' }.must_output nil, <<-EOD.gsub(/^\t+/,'')
+				proc { memorack 'theme', '-h' }.must_output nil, <<-EOD.cut_indent
 					Usage: memorack theme [options] [THEME]
 
 					    -c, --copy                       テーマをコピーする
@@ -114,7 +128,7 @@ describe MemoRack do
 			end
 
 			it "server" do
-				proc { memorack 'server', '-h' }.must_output nil, <<-EOD.gsub(/^\t+/,'')
+				proc { memorack 'server', '-h' }.must_output nil, <<-EOD.cut_indent
 					Usage: memorack server [options] PATH
 
 					    -p, --port PORT                  ポートを使う (省略値: 9292)
@@ -131,7 +145,7 @@ describe MemoRack do
 
 			Dir.chdir(@tmpdir) {
 				proc { memorack 'create', name }.must_output "Created '#{name}'\n"
-				`cd #{name}; find . -print`.must_equal <<-EOD.gsub(/^\t+/,'')
+				`cd #{name}; find . -print`.must_equal <<-EOD.cut_indent
 					.
 					./.gitignore
 					./.powenv
@@ -159,7 +173,7 @@ describe MemoRack do
 
 	describe "theme" do
 		it "theme" do
-			proc { memorack 'theme' }.must_output <<-EOD.gsub(/^\t+/,'')
+			proc { memorack 'theme' }.must_output <<-EOD.cut_indent
 				MemoRack:
 				  basic
 				  oreilly
@@ -168,7 +182,7 @@ describe MemoRack do
 
 		it "theme(with user)" do
 			chmemo { |name|
-				proc { memorack 'theme' }.must_output <<-EOD.gsub(/^\t+/,'')
+				proc { memorack 'theme' }.must_output <<-EOD.cut_indent
 					MemoRack:
 					  basic
 					  oreilly
@@ -180,7 +194,7 @@ describe MemoRack do
 
 		it "theme THEME" do
 			chmemo { |name|
-				proc { memorack 'theme', 'custom' }.must_output <<-EOD.gsub(/^\t+/,'')
+				proc { memorack 'theme', 'custom' }.must_output <<-EOD.cut_indent
 					custom --> [oreilly] --> [basic]
 					  config.json
 					  index.md
@@ -194,7 +208,7 @@ describe MemoRack do
 			chmemo { |name|
 				proc { memorack 'theme', '-c', theme }.must_output "Created 'themes/#{theme}'\n"
 
-				`cd themes/#{theme}; find . -print`.must_equal <<-EOD.gsub(/^\t+/,'')
+				`cd themes/#{theme}; find . -print`.must_equal <<-EOD.cut_indent
 					.
 					./2-column.scss
 					./basic-styles.scss
