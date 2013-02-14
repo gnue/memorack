@@ -20,6 +20,7 @@ Or install it yourself as:
 
 	$ memorack create PATH				# Generate template folder
 	$ memorack theme					# Show theme list
+	$ memorack theme THEME				# Show theme info
 	$ memorack theme -c THEME			# Copy theme
 	$ memorack server PATH				# Instant Server
 
