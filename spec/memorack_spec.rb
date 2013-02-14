@@ -8,10 +8,15 @@ require 'memorack/cli'
 describe MemoRack do
 	# MemoRack::CLI.run を呼出す
 	def memorack(*argv)
+		program_name = $0
+
 		begin
+			$0 = 'memorack'
 			MemoRack::CLI.run(argv)
 		rescue SystemExit => err
 			@abort = err.inspect
+		ensure
+			$0 = program_name
 		end
 	end
 
@@ -29,6 +34,95 @@ describe MemoRack do
 	before do
 		require 'tmpdir'
 		@tmpdir = Dir.mktmpdir
+	end
+
+	describe "usage" do
+		describe "en" do
+			before do
+				ENV['LANG'] = 'en_US.UTF-8'
+			end
+
+			it "usage" do
+				proc { memorack '-h' }.must_output nil, <<-EOD.gsub(/^\t+/,'')
+					Usage: memorack create [options] PATH
+					       memorack theme  [options] [THEME]
+					       memorack server [options] PATH
+
+					    -h, --help                       Show this message
+				EOD
+			end
+
+			it "create" do
+				proc { memorack 'create', '-h' }.must_output nil, <<-EOD.gsub(/^\t+/,'')
+					Usage: memorack create [options] PATH
+					    -h, --help                       Show this message
+				EOD
+			end
+
+			it "theme" do
+				proc { memorack 'theme', '-h' }.must_output nil, <<-EOD.gsub(/^\t+/,'')
+					Usage: memorack theme [options] [THEME]
+
+					    -c, --copy                       Copy theme
+					    -d, --dir DIR                    Theme directory (default: themes)
+					    -h, --help                       Show this message
+				EOD
+			end
+
+			it "server" do
+				proc { memorack 'server', '-h' }.must_output nil, <<-EOD.gsub(/^\t+/,'')
+					Usage: memorack server [options] PATH
+
+					    -p, --port PORT                  use PORT (default: 9292)
+					    -t, --theme THEME                use THEME (default: oreilly)
+					    -h, --help                       Show this message
+				EOD
+			end
+		end
+
+		describe "ja" do
+			before do
+				ENV['LANG'] = 'ja_JP.UTF-8'
+			end
+
+			it "usage" do
+				proc { memorack '-h' }.must_output nil, <<-EOD.gsub(/^\t+/,'')
+					Usage: memorack create [options] PATH
+					       memorack theme  [options] [THEME]
+					       memorack server [options] PATH
+
+					    -h, --help                       このメッセージを表示
+				EOD
+			end
+
+			it "create" do
+				proc { memorack 'create', '-h' }.must_output nil, <<-EOD.gsub(/^\t+/,'')
+					Usage: memorack create [options] PATH
+					    -h, --help                       このメッセージを表示
+				EOD
+			end
+
+
+			it "theme" do
+				proc { memorack 'theme', '-h' }.must_output nil, <<-EOD.gsub(/^\t+/,'')
+					Usage: memorack theme [options] [THEME]
+
+					    -c, --copy                       テーマをコピーする
+					    -d, --dir DIR                    テーマのディレクトリー（省略値: themes）
+					    -h, --help                       このメッセージを表示
+				EOD
+			end
+
+			it "server" do
+				proc { memorack 'server', '-h' }.must_output nil, <<-EOD.gsub(/^\t+/,'')
+					Usage: memorack server [options] PATH
+
+					    -p, --port PORT                  ポートを使う (省略値: 9292)
+					    -t, --theme THEME                テーマを使う (省略値: oreilly)
+					    -h, --help                       このメッセージを表示
+				EOD
+			end
+		end
 	end
 
 	describe "create" do
