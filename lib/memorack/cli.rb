@@ -188,23 +188,33 @@ module MemoRack
 
 		# テーマ関連の操作
 		def memorack_theme(options, *argv)
-			theme = argv.shift
+			theme_or_file = argv.shift
 
 			themes = File.expand_path("../themes", __FILE__)
 			dir = options[:dir]
 
-			if theme
-				from = File.join(themes, theme)
-				abort "Theme not exists '#{theme}'" unless File.directory?(from)
+			if theme_or_file
+				theme = theme_or_file.gsub(%r(/.*), '')
 
 				if options[:copy]
 					# テーマをコピー
-					path = File.directory?(dir) ? File.join(dir, theme) : theme
+					theme_dir = File.join(themes, theme)
+					abort "Theme not exists '#{theme}'" unless File.directory?(theme_dir)
+
+					from = File.join(themes, theme_or_file)
+					abort "File not exists '#{theme_or_file}'" unless File.exists?(from)
+
+					path = name = File.basename(from)
+					path = File.join(dir, name) if File.directory?(dir) && File.directory?(from)
+
 					FileUtils.copy_entry(from, path)
 					puts "Created '#{path}'"
 				else
 					# テーマの情報を表示
 					app = MemoRack::MemoApp.new(nil, theme: theme, root: dir)
+					theme_dir = app.themes.first
+
+					abort "Theme not exists '#{theme}'" unless theme_dir
 
 					# 継承関係の表示
 					theme_chain = app.themes.collect { |path|
@@ -215,7 +225,7 @@ module MemoRack
 					puts theme_chain.join(' --> ')
 
 					# ファイル一覧の表示
-					dir_earch(app.themes.first) { |file|
+					dir_earch(theme_dir) { |file|
 						puts "  #{file}"
 					}
 				end
