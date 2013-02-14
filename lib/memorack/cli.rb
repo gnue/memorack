@@ -195,7 +195,7 @@ module MemoRack
 
 			if theme
 				from = File.join(themes, theme)
-				"Theme not exists '#{theme}'" unless File.directory?(from)
+				abort "Theme not exists '#{theme}'" unless File.directory?(from)
 
 				if options[:copy]
 					# テーマをコピー
