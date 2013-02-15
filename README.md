@@ -54,16 +54,16 @@ OS X (Pow + powder)
 Template
 
 	.
-	├── .gitignore					-- for git
-	├── .powenv						-- for pow + rbenv
-	├── Gemfile						-- `bundle install`
-	├── config.ru					-- for rack application
-	├── content						-- Content directory for memo
-	│   └── README.md				-- Sample file(remove it)
+	├── .gitignore                 -- for git
+	├── .powenv                    -- for pow + rbenv
+	├── Gemfile                    -- `bundle install`
+	├── config.ru                  -- for rack application
+	├── content                    -- Content directory for memo
+	│   └── README.md              -- Sample file(remove it)
 	└── themes
-	    └── custom					-- Default theme
-	        ├── config.json			-- Configuration
-	        └── index.md			-- Description(Show by top page)
+	    └── custom                 -- Default theme
+	        ├── config.json        -- Configuration
+	        └── index.md           -- Description(Show by top page)
 
 ## Customization
 
