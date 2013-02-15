@@ -65,7 +65,7 @@ Template
 	        ├── config.json			-- Configuration
 	        └── index.md			-- Description(Show by top page)
 
-## Customizing
+## Customization
 
 ### Layout
 
@@ -75,6 +75,41 @@ Template
 	$ memorack theme -c basic/index.html
 	Created 'index.html'
 	(Edit 'index.html'...)
+
+Directory
+
+	└── themes
+	    └── custom
+	        ├── config.json
+	        ├── index.html         <-- Edit layout
+	        └── index.md
+
+### Logo
+
+	└── themes
+	    └── custom
+	        ├── config.json        <-- Add "logo": "/img/logo.png"
+	        ├── img
+	        │   └── logo.png       <-- Add image file
+	        ├── index.html         <-- Add <img id="logo" src="{{logo}}" />
+	        └── index.md
+
+### Syntax highlighting
+
+Download [highlight.js](http://softwaremaniacs.org/soft/highlight/en/)
+
+	└── themes
+	    └── custom
+	        ├── config.json
+	        ├── highlight.js       <-- `unzip highlight.zip`
+	        ├── index.html         <-- Add code
+	        └── index.md
+
+Add code to `index.html`
+
+	<link rel="stylesheet" href="/highlight.js/styles/default.css">
+	<script src="/highlight.js/highlight.pack.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
 
 #### mustache variables
 
