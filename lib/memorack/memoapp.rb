@@ -57,7 +57,7 @@ module MemoRack
 			define_statics(@root, *@themes)
 
 			# ファイル監視を行う
-			watcher(@root) if @directory_watcher
+			watcher(@root, @directory_watcher) if @directory_watcher
 		end
 
 		def call(env)
@@ -199,11 +199,13 @@ module MemoRack
 		end
 
 		# ファイル監視を行う
-		def watcher(path = '.')
+		def watcher(path = '.', interval = 1.0)
 			require 'directory_watcher'
 
+			interval = 1.0 if interval == true # 旧バージョンとの互換性のため
+
 			dw = DirectoryWatcher.new path, :pre_load => true
-			dw.interval = 1
+			dw.interval = interval
 			dw.stable = 2
 			dw.glob = '**/*'
 			dw.add_observer { |*args|
