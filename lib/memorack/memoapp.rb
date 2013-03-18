@@ -19,6 +19,7 @@ module MemoRack
 			markdown:			'redcarpet',
 			formats:			['markdown'],
 			css:				nil,
+			suffix:				'',
 			directory_watcher:	false
 		}
 
@@ -84,10 +85,18 @@ module MemoRack
 					content = render @css.to_sym, "#{path}.#{@css}", {views: @themes, cache_location: cache_location}
 				end
 			else
+				if @suffix == ''
+					path = path_info
+					fullpath = file_search(path, @options)
+					return pass(env) unless fullpath
+
+					ext = split_extname(fullpath)[1]
+				end
+
 				return pass(env) unless ext && Tilt.registered?(ext)
 
 				if query.has_key?('edit')
-					fullpath = File.expand_path(File.join(@root, path_info))
+					fullpath = File.expand_path(File.join(@root, "#{path}.#{ext}")) unless fullpath
 
 					# @attention リダイレクトはうまく動作しない
 					#
@@ -218,6 +227,34 @@ module MemoRack
 			dw.start
 		end
 
+		# ファイルを探す
+		def file_search(template, options = {})
+			options = {views: @root}.merge(options)
+
+			if options[:views].kind_of?(Array)
+				err = nil
+
+				options[:views].each { |views|
+					options[:views] = views
+
+					begin
+						return file_search(template, options)
+					rescue Errno::ENOENT => e
+						err = e
+					end
+				}
+
+				raise err
+			end
+
+			collect_formats.values.flatten.each { |ext|
+				path = File.join(options[:views], "#{template}.#{ext}")
+				return path if File.exists?(path)
+			}
+
+			return nil
+		end
+
 		# テンプレートエンジンで render する
 		def render(engine, template, options = {}, locals = {})
 			options = {views: @root}.merge(options)
@@ -343,7 +380,7 @@ module MemoRack
 
 		# メニューを作成
 		template :menu do
-			mdmenu = MdMenu.new({prefix: '/', uri_escape: true, formats: collect_formats})
+			mdmenu = MdMenu.new({prefix: '/', suffix: @suffix, uri_escape: true, formats: collect_formats})
 			Dir.chdir(@root) { |path| mdmenu.collection('.') }
 			mdmenu.generate(StringIO.new).string
 		end
