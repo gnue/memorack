@@ -1,5 +1,6 @@
 # coding: utf-8
 
+require 'pathname'
 require 'rubygems'
 require 'rack'
 require 'uri'
@@ -104,7 +105,8 @@ module MemoRack
 					# return redirect(redirect_url, 302) if File.exists?(fullpath)
 				end
 
-				content = render_with_mustache path.to_sym, ext
+				template = fullpath ? Pathname.new(fullpath) : path.to_sym
+				content = render_with_mustache template, ext
 			end
 
 			return pass(env) unless content
@@ -259,7 +261,9 @@ module MemoRack
 		def render(engine, template, options = {}, locals = {})
 			options = {views: @root}.merge(options)
 
-			if options[:views].kind_of?(Array)
+			if template.kind_of?(Pathname)
+				path = template
+			elsif options[:views].kind_of?(Array)
 				err = nil
 
 				options[:views].each { |views|
@@ -273,10 +277,10 @@ module MemoRack
 				}
 
 				raise err
+			else
+				fname = template.kind_of?(String) ? template : "#{template}.#{engine}"
+				path = File.join(options[:views], fname)
 			end
-
-			fname = template.kind_of?(String) ? template : "#{template}.#{engine}"
-			path = File.join(options[:views], fname)
 
 			engine = Tilt.new(File.join(File.dirname(path), ".#{engine}"), options) {
 				method = MemoApp.template_method(template)
