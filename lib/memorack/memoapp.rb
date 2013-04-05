@@ -7,6 +7,7 @@ require 'uri'
 
 require 'memorack/tilt-mustache'
 require 'memorack/mdmenu'
+require 'memorack/locals'
 
 module MemoRack
 	class MemoApp
@@ -144,15 +145,17 @@ module MemoRack
 
 		# デフォルトの locals を生成する
 		def default_locals(locals = {})
-			locals = locals.dup
+			locals = Locals[locals]
 
-			locals[:page]			||= {}
-			locals[:page][:title]	||= locals[:title]
-
-			locals[:app]			||= {}
+			locals[:app]			||= Locals[]
 			locals[:app][:name]		||= MemoRack::name
 			locals[:app][:version]	||= MemoRack::VERSION
 			locals[:app][:url]		||= MemoRack::HOMEPAGE
+
+			locals.define_key(:__menu__) { |hash, key|
+				@menu = nil unless @directory_watcher	# ファイル監視していない場合はメニューを初期化
+				@menu ||= render :markdown, :menu, @options
+			}
 
 			locals
 		end
@@ -304,19 +307,29 @@ module MemoRack
 		def render_with_mustache(template, engine = :markdown, options = {}, locals = {})
 			begin
 				options = @options.merge(options)
-
-				@menu = nil unless @directory_watcher	# ファイル監視していない場合はメニューを初期化
-
-				@menu ||= render :markdown, :menu, options
-				content = render engine, template, options
-				fname = locals[:path_info]
-				fname ||= template.to_s.force_encoding('UTF-8')
-
 				locals = @locals.merge(locals)
 
-				locals[:__menu__]		= @menu
-				locals[:__content__]	= content
-				locals[:page][:title]	= [File.basename(fname), locals[:title]].join(' | ') unless template == :index
+				locals.define_key(:__content__) { |hash, key|
+					render engine, template, options
+				}
+
+				locals[:page] = page = Locals[]
+
+				page.define_key(:name) { |hash, key|
+					unless template == :index
+						fname = locals[:path_info]
+						fname ||= template.to_s.force_encoding('UTF-8')
+						File.basename(fname)
+					end
+				}
+
+				page.define_key(:title) { |hash, key|
+					page_title = home_title = locals[:title]
+					page_name = hash[:name]
+					page_title = "#{page_name} | #{home_title}" if page_name
+
+					page_title
+				}
 
 				render :mustache, 'index.html', {views: @themes}, locals
 			rescue => e
