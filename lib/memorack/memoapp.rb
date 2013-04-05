@@ -313,6 +313,7 @@ module MemoRack
 					render engine, template, options
 				}
 
+				locals[:content] = true unless template == :index
 				locals[:page] = page = Locals[]
 
 				page.define_key(:name) { |hash, key|
