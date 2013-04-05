@@ -240,13 +240,15 @@ module MemoRack
 					options[:views] = views
 
 					begin
-						return file_search(template, options)
+						path = file_search(template, options)
+						return path if path
 					rescue Errno::ENOENT => e
 						err = e
 					end
 				}
 
-				raise err
+				raise err if err
+				return nil
 			end
 
 			collect_formats.values.flatten.each { |ext|
