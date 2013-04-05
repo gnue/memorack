@@ -1,5 +1,6 @@
 # coding: utf-8
 
+require 'pathname'
 require 'rubygems'
 require 'rack'
 require 'uri'
@@ -19,6 +20,7 @@ module MemoRack
 			markdown:			'redcarpet',
 			formats:			['markdown'],
 			css:				nil,
+			suffix:				'',
 			directory_watcher:	false
 		}
 
@@ -67,10 +69,11 @@ module MemoRack
 			query = Rack::Utils.parse_query(req.query_string)
 			path_info = URI.unescape(req.path_info)
 			path, ext = split_extname(path_info)
+			locals = {env: env, path_info: path_info}
 
 			case path_info
 			when '/'
-				content = render_with_mustache :index, :markdown
+				content = render_with_mustache :index, :markdown, {}, locals
 			when /\.css$/
 				case @css
 				when 'scss', 'sass'
@@ -84,10 +87,18 @@ module MemoRack
 					content = render @css.to_sym, "#{path}.#{@css}", {views: @themes, cache_location: cache_location}
 				end
 			else
+				if @suffix == ''
+					path = path_info
+					fullpath = file_search(path, @options)
+					return pass(env) unless fullpath
+
+					ext = split_extname(fullpath)[1]
+				end
+
 				return pass(env) unless ext && Tilt.registered?(ext)
 
 				if query.has_key?('edit')
-					fullpath = File.expand_path(File.join(@root, path_info))
+					fullpath = File.expand_path(File.join(@root, "#{path}.#{ext}")) unless fullpath
 
 					# @attention リダイレクトはうまく動作しない
 					#
@@ -95,7 +106,8 @@ module MemoRack
 					# return redirect(redirect_url, 302) if File.exists?(fullpath)
 				end
 
-				content = render_with_mustache path.to_sym, ext
+				template = fullpath ? Pathname.new(fullpath) : path.to_sym
+				content = render_with_mustache template, ext, {}, locals
 			end
 
 			return pass(env) unless content
@@ -218,11 +230,43 @@ module MemoRack
 			dw.start
 		end
 
+		# ファイルを探す
+		def file_search(template, options = {})
+			options = {views: @root}.merge(options)
+
+			if options[:views].kind_of?(Array)
+				err = nil
+
+				options[:views].each { |views|
+					options[:views] = views
+
+					begin
+						path = file_search(template, options)
+						return path if path
+					rescue Errno::ENOENT => e
+						err = e
+					end
+				}
+
+				raise err if err
+				return nil
+			end
+
+			collect_formats.values.flatten.each { |ext|
+				path = File.join(options[:views], "#{template}.#{ext}")
+				return path if File.exists?(path)
+			}
+
+			return nil
+		end
+
 		# テンプレートエンジンで render する
 		def render(engine, template, options = {}, locals = {})
 			options = {views: @root}.merge(options)
 
-			if options[:views].kind_of?(Array)
+			if template.kind_of?(Pathname)
+				path = template
+			elsif options[:views].kind_of?(Array)
 				err = nil
 
 				options[:views].each { |views|
@@ -236,10 +280,10 @@ module MemoRack
 				}
 
 				raise err
+			else
+				fname = template.kind_of?(String) ? template : "#{template}.#{engine}"
+				path = File.join(options[:views], fname)
 			end
-
-			fname = template.kind_of?(String) ? template : "#{template}.#{engine}"
-			path = File.join(options[:views], fname)
 
 			engine = Tilt.new(File.join(File.dirname(path), ".#{engine}"), options) {
 				method = MemoApp.template_method(template)
@@ -265,7 +309,8 @@ module MemoRack
 
 				@menu ||= render :markdown, :menu, options
 				content = render engine, template, options
-				fname = template.to_s.force_encoding('UTF-8')
+				fname = locals[:path_info]
+				fname ||= template.to_s.force_encoding('UTF-8')
 
 				locals = @locals.merge(locals)
 
@@ -343,7 +388,7 @@ module MemoRack
 
 		# メニューを作成
 		template :menu do
-			mdmenu = MdMenu.new({prefix: '/', uri_escape: true, formats: collect_formats})
+			mdmenu = MdMenu.new({prefix: '/', suffix: @suffix, uri_escape: true, formats: collect_formats})
 			Dir.chdir(@root) { |path| mdmenu.collection('.') }
 			mdmenu.generate(StringIO.new).string
 		end
