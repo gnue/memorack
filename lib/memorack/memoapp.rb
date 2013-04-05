@@ -69,10 +69,11 @@ module MemoRack
 			query = Rack::Utils.parse_query(req.query_string)
 			path_info = URI.unescape(req.path_info)
 			path, ext = split_extname(path_info)
+			locals = {env: env, path_info: path_info}
 
 			case path_info
 			when '/'
-				content = render_with_mustache :index, :markdown
+				content = render_with_mustache :index, :markdown, {}, locals
 			when /\.css$/
 				case @css
 				when 'scss', 'sass'
@@ -106,7 +107,7 @@ module MemoRack
 				end
 
 				template = fullpath ? Pathname.new(fullpath) : path.to_sym
-				content = render_with_mustache template, ext
+				content = render_with_mustache template, ext, {}, locals
 			end
 
 			return pass(env) unless content
@@ -308,7 +309,8 @@ module MemoRack
 
 				@menu ||= render :markdown, :menu, options
 				content = render engine, template, options
-				fname = template.to_s.force_encoding('UTF-8')
+				fname = locals[:path_info]
+				fname ||= template.to_s.force_encoding('UTF-8')
 
 				locals = @locals.merge(locals)
 
