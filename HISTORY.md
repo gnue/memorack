@@ -1,0 +1,16 @@
+## History
+
+### v0.0.3 / 2013-04-06
+
+* Abstraction URI
+* other css render engines support (less)
+* custom error page
+
+### v0.0.2 / 2013-02-15
+
+* fix highlight.js with oreilly theme
+* add customizing Tips for syntax highlighting
+
+### v0.0.1 / 2013-02-14
+
+* first release
