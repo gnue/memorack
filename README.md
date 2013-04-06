@@ -132,7 +132,8 @@ Special variables -- `{{{VAR}}}`
 * Template comments translate english
 * Add customizing tips
 * Server test program
-* Abstraction of URI
+* Generate HTMLs for static site
+* Plugin
 
 ## Contributing
 
