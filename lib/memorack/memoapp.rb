@@ -248,7 +248,7 @@ module MemoRack
 		end
 
 		# ファイルを探す
-		def file_search(template, options = {})
+		def file_search(template, options = {}, exts = enable_exts)
 			options = {views: @root}.merge(options)
 
 			if options[:views].kind_of?(Array)
@@ -258,7 +258,7 @@ module MemoRack
 					options[:views] = views
 
 					begin
-						path = file_search(template, options)
+						path = file_search(template, options, exts)
 						return path if path
 					rescue Errno::ENOENT => e
 						err = e
@@ -269,7 +269,7 @@ module MemoRack
 				return nil
 			end
 
-			enable_exts.each { |ext|
+			exts.each { |ext|
 				path = File.join(options[:views], "#{template}.#{ext}")
 				return path if File.exists?(path)
 			}
