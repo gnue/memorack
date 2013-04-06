@@ -74,6 +74,7 @@ class MdMenu
 
 		Dir.glob(pattern) { |path|
 			link = @config[:prefix].to_s + (@config[:uri_escape] ? URI.escape(path, URI_UNSAFE) : path)
+			link = link.sub(/\.[^.]*$/, '') + @config[:suffix] if @config[:suffix]
 			@files << {:link => link, :path => path} if ! @links.member?(link)
 		}
 	end
@@ -166,12 +167,13 @@ if __FILE__ == $0
 	config = {:verbose => true}
 
 	OptionParser.new { |opts|
-		opts.banner = "Usage: #{opts.program_name} [-f FILE] [-u] [-e] [--prefix PREFIX] DIRECTORY… "
+		opts.banner = "Usage: #{opts.program_name} [-f FILE] [-u] [-e] [--prefix PREFIX] [--suffix SUFFIX] DIRECTORY… "
 
 		opts.on('-f FILE', 'menu file')						{ |v| config[:file] = v }
 		opts.on('-u', 'file update(default is dry-run)')	{ config[:update] = true }
 		opts.on('-e', 'URI escape')							{ config[:uri_escape] = true }
 		opts.on('-p PREFIX', '--prefix PREFIX', 'link prefix') { |v| config[:prefix] = v }
+		opts.on('-s SUFFIX', '--suffix SUFFIX', 'link suffix') { |v| config[:suffix] = v }
 		opts.on('-h', '--help')								{ abort opts.help }
 		opts.parse!(ARGV)
 	}

@@ -1,5 +1,6 @@
 def update_version(path)
-	version = `git describe --tags --dirty`.chomp
+	version = `git describe --dirty 2>/dev/null`.chomp
+	version = `git describe --tags --dirty`.chomp if version.empty?
 	version[0, 1] = '' if version =~ /^v[0-9]/
 	version.gsub!(/-([a-z0-9]+(-dirty)?)$/) { |m| "(#{$1})" }
 
