@@ -209,15 +209,22 @@ module MemoRack
 			else
 				fullpath = file_search("/#{code}", {views: @themes})
 				ext = split_extname(fullpath)[1]
+				locals = {env: env, path_info: path_info, page: {name: "Error #{code}"}}
 
 				if ext && Tilt.registered?(ext)
-					locals = {env: env, path_info: path_info, page: {name: "Error #{code}"}}
+					template = Pathname.new(fullpath)
+				else
+					template = "Error #{code}: #{path_info}"
+					ext = nil
+				end
 
-					content = render_with_mustache Pathname.new(fullpath), ext, {mustache: 'error.html'}, locals
-					if content
-						content_type = 'text/html'
-						body = [content.to_s]
-					end
+				content = render_with_mustache template, ext, {mustache: 'error.html'}, locals
+
+				if content
+					content_type = 'text/html'
+					body = [content.to_s]
+				else
+					body = ["Error #{code}: ", path_info]
 				end
 			end
 
@@ -323,7 +330,11 @@ module MemoRack
 				locals = @locals.merge(locals)
 
 				locals.define_key(:__content__) { |hash, key|
-					render engine, template, options
+					if engine
+						render engine, template, options
+					else
+						template
+					end
 				}
 
 				locals[:content] = true unless template == :index
