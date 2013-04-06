@@ -67,14 +67,11 @@ module MemoRack
 			content_type = 'text/html'
 
 			req = Rack::Request.new(env)
-			query = Rack::Utils.parse_query(req.query_string)
 			path_info = URI.unescape(req.path_info)
-			path, ext = split_extname(path_info)
-			locals = {env: env, path_info: path_info}
 
 			case path_info
 			when '/'
-				content = render_with_mustache :index, :markdown, {}, locals
+				content = render_with_mustache :index, :markdown
 			when /\.css$/
 				case @css
 				when 'scss', 'sass'
@@ -87,39 +84,22 @@ module MemoRack
 					cache_location = File.expand_path('sass-cache', @tmpdir)
 
 					begin
+						path, = split_extname(path_info)
 						content = render @css.to_sym, "#{path}.#{@css}", {views: @themes, cache_location: cache_location}
-					rescue
+					rescue Errno::ENOENT => e
+						return error(env, 404)
 					end
 				end
 			else
-				if @suffix == ''
-					path = path_info
-					fullpath = file_search(path, @options)
-					return pass(env) unless fullpath
-
-					ext = split_extname(fullpath)[1]
-				end
-
-				return pass(env) unless ext && Tilt.registered?(ext)
-
-				if query.has_key?('edit')
-					fullpath = File.expand_path(File.join(@root, "#{path}.#{ext}")) unless fullpath
-
-					# @attention リダイレクトはうまく動作しない
-					#
-					# redirect_url = 'file://' + File.expand_path(File.join(@root, req.path_info))
-					# return redirect(redirect_url, 302) if File.exists?(fullpath)
-				end
-
-				template = fullpath ? Pathname.new(fullpath) : path.to_sym
-				content = render_with_mustache template, ext, {}, locals
+				content = render_content(env, path_info)
 			end
 
-			return pass(env) unless content
+			return [200, {'Content-Type' => content_type}, [content.to_s]] if content
 
-			[200, {'Content-Type' => content_type}, [content.to_s]]
+			pass(env) { |env, code|
+				error(env, code)
+			} 
 		end
-
 
 		# リダイレクト
 		def redirect(url, code = 301)
@@ -214,7 +194,34 @@ module MemoRack
 				return result unless result.first == 404
 			}
 
-			[404, {'Content-Type' => 'text/plain'}, ['File not found: ', env['PATH_INFO']]]
+			return yield(env, 404) if block_given?
+
+			error(env, 404, 'File not found: ')
+		end
+
+		# エラー
+		def error(env, code, body = nil, content_type = 'text/plain; charset=utf-8')
+			req = Rack::Request.new(env)
+			path_info = URI.unescape(req.path_info)
+
+			if body
+				body = [body.to_s, path_info] unless body.kind_of?(Array)
+			else
+				fullpath = file_search("/#{code}", {views: @themes})
+				ext = split_extname(fullpath)[1]
+
+				if ext && Tilt.registered?(ext)
+					locals = {env: env, path_info: path_info, page: {name: "Error #{code}"}}
+
+					content = render_with_mustache Pathname.new(fullpath), ext, {mustache: 'error.html'}, locals
+					if content
+						content_type = 'text/html'
+						body = [content.to_s]
+					end
+				end
+			end
+
+			[code, {'Content-Type' => content_type, }, body]
 		end
 
 		# ファイル監視を行う
@@ -310,6 +317,8 @@ module MemoRack
 		# レイアウトに mustache を適用してテンプレートエンジンでレンダリングする
 		def render_with_mustache(template, engine = :markdown, options = {}, locals = {})
 			begin
+				mustache_templ = options[:mustache] || 'index.html'
+
 				options = @options.merge(options)
 				locals = @locals.merge(locals)
 
@@ -318,7 +327,7 @@ module MemoRack
 				}
 
 				locals[:content] = true unless template == :index
-				locals[:page] = page = Locals[]
+				locals[:page] = page = Locals[locals[:page] || {}]
 
 				page.define_key(:name) { |hash, key|
 					unless template == :index
@@ -336,10 +345,41 @@ module MemoRack
 					page_title
 				}
 
-				render :mustache, 'index.html', {views: @themes}, locals
+				render :mustache, mustache_templ, {views: @themes}, locals
 			rescue => e
 				e.to_s
 			end
+		end
+
+		# コンテンツをレンダリングする
+		def render_content(env, path_info)
+			path, ext = split_extname(path_info)
+
+			if @suffix == ''
+				path = path_info
+				fullpath = file_search(path, @options)
+				return nil unless fullpath
+
+				ext = split_extname(fullpath)[1]
+			end
+
+			return nil unless ext && Tilt.registered?(ext)
+
+			req = Rack::Request.new(env)
+			query = Rack::Utils.parse_query(req.query_string)
+			locals = {env: env, path_info: path_info}
+
+			if query.has_key?('edit')
+				fullpath = File.expand_path(File.join(@root, "#{path}.#{ext}")) unless fullpath
+
+				# @attention リダイレクトはうまく動作しない
+				#
+				# redirect_url = 'file://' + File.expand_path(File.join(@root, req.path_info))
+				# return redirect(redirect_url, 302) if File.exists?(fullpath)
+			end
+
+			template = fullpath ? Pathname.new(fullpath) : path.to_sym
+			content = render_with_mustache template, ext, {}, locals
 		end
 
 		# 拡張子を取出す
