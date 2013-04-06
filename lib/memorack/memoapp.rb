@@ -75,16 +75,9 @@ module MemoRack
 				result = pass(env, @statics)
 				return result unless result.first == 404
 
-				content_type = 'text/css'
-
 				begin
-					case @css
-					when 'scss', 'sass'
-						require 'sass'
-						cache_location = File.expand_path('sass-cache', @tmpdir)
-						path, = split_extname(path_info)
-						content = render @css.to_sym, "#{path}.#{@css}", {views: @themes, cache_location: cache_location}
-					end
+					content_type = 'text/css'
+					content = render_css(env, path_info)
 				rescue Errno::ENOENT => e
 					return error(env, 404)
 				end
@@ -394,6 +387,19 @@ module MemoRack
 
 			template = fullpath ? Pathname.new(fullpath) : path.to_sym
 			content = render_with_mustache template, ext, {}, locals
+		end
+
+		# CSSをレンダリングする
+		def render_css(env, path_info)
+			case @css
+			when 'scss', 'sass'
+				require 'sass'
+				cache_location = File.expand_path('sass-cache', @tmpdir)
+				path, = split_extname(path_info)
+				content = render @css.to_sym, "#{path}.#{@css}", {views: @themes, cache_location: cache_location}
+			end
+
+			content
 		end
 
 		# 拡張子を取出す
