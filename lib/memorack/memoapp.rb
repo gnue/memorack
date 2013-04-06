@@ -269,7 +269,7 @@ module MemoRack
 				return nil
 			end
 
-			collect_formats.values.flatten.each { |ext|
+			enable_exts.each { |ext|
 				path = File.join(options[:views], "#{template}.#{ext}")
 				return path if File.exists?(path)
 			}
@@ -440,6 +440,11 @@ module MemoRack
 			end
 
 			@collect_formats
+		end
+
+		# 対応している拡張子
+		def enable_exts
+			@enable_exts ||= collect_formats.values.flatten
 		end
 
 		# テンプレート名
