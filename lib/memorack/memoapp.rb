@@ -391,14 +391,24 @@ module MemoRack
 
 		# CSSをレンダリングする
 		def render_css(env, path_info)
-			case @css
+			return unless @css
+
+			exts = @css
+			exts = [exts] unless exts.kind_of?(Array)
+			path, = split_extname(path_info)
+			options = {views: @themes}
+
+			fullpath = file_search(path, options, exts)
+			return nil unless fullpath
+
+			ext = split_extname(fullpath)[1]
+
+			case ext
 			when 'scss', 'sass'
-				cache_location = File.expand_path('sass-cache', @tmpdir)
-				path, = split_extname(path_info)
-				content = render @css.to_sym, "#{path}.#{@css}", {views: @themes, cache_location: cache_location}
+				options[:cache_location] = File.expand_path('sass-cache', @tmpdir)
 			end
 
-			content
+			render ext, Pathname.new(fullpath), options
 		end
 
 		# 拡張子を取出す
