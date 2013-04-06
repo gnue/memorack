@@ -66,8 +66,7 @@ module MemoRack
 		def call(env)
 			content_type = 'text/html'
 
-			req = Rack::Request.new(env)
-			path_info = URI.unescape(req.path_info)
+			path_info = unescape_path_info(env)
 
 			case path_info
 			when '/'
@@ -99,6 +98,12 @@ module MemoRack
 			pass(env) { |env, code|
 				error(env, code)
 			} 
+		end
+
+		# PATH_INFO を unescape して取出す
+		def unescape_path_info(env)
+			path_info = URI.unescape(env['PATH_INFO'])
+			path_info.force_encoding('UTF-8')
 		end
 
 		# リダイレクト
@@ -201,8 +206,7 @@ module MemoRack
 
 		# エラー
 		def error(env, code, body = nil, content_type = 'text/plain; charset=utf-8')
-			req = Rack::Request.new(env)
-			path_info = URI.unescape(req.path_info)
+			path_info = unescape_path_info(env)
 
 			if body
 				body = [body.to_s, path_info] unless body.kind_of?(Array)
