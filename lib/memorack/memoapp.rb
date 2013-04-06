@@ -72,22 +72,14 @@ module MemoRack
 			when '/'
 				content = render_with_mustache :index, :markdown
 			when /\.css$/
-				case @css
-				when 'scss', 'sass'
-					require 'sass'
+				result = pass(env, @statics)
+				return result unless result.first == 404
 
-					result = pass(env, @statics)
-					return result unless result.first == 404
-
+				begin
 					content_type = 'text/css'
-					cache_location = File.expand_path('sass-cache', @tmpdir)
-
-					begin
-						path, = split_extname(path_info)
-						content = render @css.to_sym, "#{path}.#{@css}", {views: @themes, cache_location: cache_location}
-					rescue Errno::ENOENT => e
-						return error(env, 404)
-					end
+					content = render_css(env, path_info)
+				rescue Errno::ENOENT => e
+					return error(env, 404)
 				end
 			else
 				content = render_content(env, path_info)
@@ -256,7 +248,7 @@ module MemoRack
 		end
 
 		# ファイルを探す
-		def file_search(template, options = {})
+		def file_search(template, options = {}, exts = enable_exts)
 			options = {views: @root}.merge(options)
 
 			if options[:views].kind_of?(Array)
@@ -266,7 +258,7 @@ module MemoRack
 					options[:views] = views
 
 					begin
-						path = file_search(template, options)
+						path = file_search(template, options, exts)
 						return path if path
 					rescue Errno::ENOENT => e
 						err = e
@@ -277,7 +269,7 @@ module MemoRack
 				return nil
 			end
 
-			collect_formats.values.flatten.each { |ext|
+			exts.each { |ext|
 				path = File.join(options[:views], "#{template}.#{ext}")
 				return path if File.exists?(path)
 			}
@@ -397,6 +389,28 @@ module MemoRack
 			content = render_with_mustache template, ext, {}, locals
 		end
 
+		# CSSをレンダリングする
+		def render_css(env, path_info)
+			return unless @css
+
+			exts = @css
+			exts = [exts] unless exts.kind_of?(Array)
+			path, = split_extname(path_info)
+			options = {views: @themes}
+
+			fullpath = file_search(path, options, exts)
+			return nil unless fullpath
+
+			ext = split_extname(fullpath)[1]
+
+			case ext
+			when 'scss', 'sass'
+				options[:cache_location] = File.expand_path('sass-cache', @tmpdir)
+			end
+
+			render ext, Pathname.new(fullpath), options
+		end
+
 		# 拡張子を取出す
 		def split_extname(path)
 			return [$1, $2] if /^(.+)\.([^.]+)/ =~ path
@@ -436,6 +450,11 @@ module MemoRack
 			end
 
 			@collect_formats
+		end
+
+		# 対応している拡張子
+		def enable_exts
+			@enable_exts ||= collect_formats.values.flatten
 		end
 
 		# テンプレート名
