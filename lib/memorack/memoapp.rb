@@ -42,6 +42,7 @@ module MemoRack
 
 			@themes_folders = [options[:themes_folder], File.expand_path('../themes/', __FILE__)]
 			read_config(options[:theme], options)
+			read_config(DEFAULT_APP_OPTIONS[:theme], options) if @themes.empty?
 
 			@app = app
 			@options = options
