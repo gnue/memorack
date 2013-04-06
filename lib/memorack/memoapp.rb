@@ -72,22 +72,21 @@ module MemoRack
 			when '/'
 				content = render_with_mustache :index, :markdown
 			when /\.css$/
-				case @css
-				when 'scss', 'sass'
-					require 'sass'
+				result = pass(env, @statics)
+				return result unless result.first == 404
 
-					result = pass(env, @statics)
-					return result unless result.first == 404
+				content_type = 'text/css'
 
-					content_type = 'text/css'
-					cache_location = File.expand_path('sass-cache', @tmpdir)
-
-					begin
+				begin
+					case @css
+					when 'scss', 'sass'
+						require 'sass'
+						cache_location = File.expand_path('sass-cache', @tmpdir)
 						path, = split_extname(path_info)
 						content = render @css.to_sym, "#{path}.#{@css}", {views: @themes, cache_location: cache_location}
-					rescue Errno::ENOENT => e
-						return error(env, 404)
 					end
+				rescue Errno::ENOENT => e
+					return error(env, 404)
 				end
 			else
 				content = render_content(env, path_info)
