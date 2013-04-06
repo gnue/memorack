@@ -81,7 +81,11 @@ module MemoRack
 
 					content_type = 'text/css'
 					cache_location = File.expand_path('sass-cache', @tmpdir)
-					content = render @css.to_sym, "#{path}.#{@css}", {views: @themes, cache_location: cache_location}
+
+					begin
+						content = render @css.to_sym, "#{path}.#{@css}", {views: @themes, cache_location: cache_location}
+					rescue
+					end
 				end
 			else
 				return pass(env) unless ext && Tilt.registered?(ext)
