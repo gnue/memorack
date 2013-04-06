@@ -393,7 +393,6 @@ module MemoRack
 		def render_css(env, path_info)
 			case @css
 			when 'scss', 'sass'
-				require 'sass'
 				cache_location = File.expand_path('sass-cache', @tmpdir)
 				path, = split_extname(path_info)
 				content = render @css.to_sym, "#{path}.#{@css}", {views: @themes, cache_location: cache_location}
