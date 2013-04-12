@@ -28,6 +28,7 @@ module MemoRack
 						Usage: #{opts.program_name} create [options] PATH
 						       #{opts.program_name} theme  [options] [THEME]
 						       #{opts.program_name} server [options] PATH
+						       #{opts.program_name} build  [options] [PATH]
 					BANNER
 
 					opts.separator ""
@@ -174,6 +175,25 @@ module MemoRack
 			abort opts.help if argv.empty?
 		}
 
+		# 静的サイトのビルド
+		define_options(:build, '[options] [PATH]') { |opts, argv, options|
+			default_options = {
+					output: 'site',
+					theme:  'custom',
+				}
+
+			options.merge!(default_options)
+
+			opts.separator ""
+			opts.on("-o", "--output DIRECTORY", String,
+				t(:output, options)) { |arg| options[:output] = arg }
+			opts.on("-t", "--theme THEME", String,
+				t(:theme, options)) { |arg| options[:theme] = arg }
+			opts.on("-h", "--help", t(:help)) { abort opts.help }
+
+			opts.parse!(argv)
+		}
+
 
 		# サブコマンド
 
@@ -258,6 +278,23 @@ module MemoRack
 
 			server_options[:app] = app
 			Rack::Server.new(server_options).start
+		end
+
+		# 静的サイトのビルド
+		def memorack_build(options, *argv)
+			path = argv.shift
+			path = 'content/' unless path
+			abort "Directory not exists '#{path}'" unless File.exists?(path)
+
+			require 'memorack/builder'
+			require 'tmpdir'
+
+			Dir.mktmpdir do |tmpdir|
+				builder = MemoRack::Builder.new(theme: options[:theme], root: path, tmpdir: tmpdir)
+				builder.generate(options)
+			end
+
+			puts "Build '#{path} -> #{options[:output]}'"
 		end
 	end
 end

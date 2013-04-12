@@ -5,3 +5,4 @@ en:
     dir:   "Theme directory (default: %{dir})"
     port:  "use PORT (default: %{Port})"
     theme: "use THEME (default: %{theme})"
+    output: "Output directory (default: %{output})"

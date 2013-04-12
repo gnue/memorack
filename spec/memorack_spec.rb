@@ -61,6 +61,7 @@ describe MemoRack do
 					Usage: memorack create [options] PATH
 					       memorack theme  [options] [THEME]
 					       memorack server [options] PATH
+					       memorack build  [options] [PATH]
 
 					    -h, --help                       Show this message
 				EOD
@@ -104,6 +105,7 @@ describe MemoRack do
 					Usage: memorack create [options] PATH
 					       memorack theme  [options] [THEME]
 					       memorack server [options] PATH
+					       memorack build  [options] [PATH]
 
 					    -h, --help                       このメッセージを表示
 				EOD
