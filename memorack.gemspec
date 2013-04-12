@@ -11,6 +11,7 @@ Gem::Specification.new do |gem|
   gem.description   = %q{Rack Application for markdown memo}
   gem.summary       = %q{Rack Application for markdown memo}
   gem.homepage      = MemoRack::HOMEPAGE
+  gem.license       = "MIT"
 
   gem.files         = `git ls-files`.split($/) + %w(REVISION)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
