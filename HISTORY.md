@@ -1,5 +1,9 @@
 ## History
 
+### v0.0.4 / 2013-04-12
+
+* fix link in content
+
 ### v0.0.3 / 2013-04-06
 
 * Abstraction URI
