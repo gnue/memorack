@@ -18,6 +18,7 @@ module MemoRack
 
 		def generate(options = {})
 			options = DEFAULT_BUILD_OPTIONS.merge(options)
+			options[:prefix] = File.join(options[:url], '') unless options[:url].empty?
 
 			output = options[:output]
 			FileUtils.mkpath(output)

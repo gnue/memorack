@@ -178,8 +178,9 @@ module MemoRack
 		# 静的サイトのビルド
 		define_options(:build, '[options] [PATH]') { |opts, argv, options|
 			default_options = {
-					output: 'site',
-					theme:  'custom',
+					output:	'site',
+					theme:	'custom',
+					url:	'',
 				}
 
 			options.merge!(default_options)
@@ -189,6 +190,8 @@ module MemoRack
 				t(:output, options)) { |arg| options[:output] = arg }
 			opts.on("-t", "--theme THEME", String,
 				t(:theme, options)) { |arg| options[:theme] = arg }
+			opts.on("--url URL", String,
+				t(:url, options)) { |arg| options[:url] = arg }
 			opts.on("-h", "--help", t(:help)) { abort opts.help }
 
 			opts.parse!(argv)
