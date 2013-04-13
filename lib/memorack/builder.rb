@@ -26,20 +26,30 @@ module MemoRack
 			@contents = contents(options)
 
 			@contents.files.each { |file|
-				path = file[:path]
-				content = render_content({}, path)
-				next unless content
-
 				yield(file) if block_given?
 
-				begin
-					to = path.sub(/\.[^.]*$/, '') + options[:suffix]
-					to = File.join(output, to)
-					FileUtils.mkpath(File.dirname(to))
-					File.write(to, content)
-				rescue
-				end
+				content_write(file[:path], options) { |template|
+					render_content({}, template)
+				}
 			}
+		end
+
+		# コンテンツをファイルに出力する
+		def content_write(template, options)
+			begin
+				content = yield(template)
+				return unless content
+
+				path = template
+				path = path.sub(/\.[^.]*$/, '') if path.kind_of?(String)
+
+				to = path.to_s + options[:suffix]
+				to = File.join(options[:output], to)
+
+				FileUtils.mkpath(File.dirname(to))
+				File.write(to, content)
+			rescue
+			end
 		end
 
 		#### テンプレート
