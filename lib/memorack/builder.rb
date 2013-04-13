@@ -38,6 +38,18 @@ module MemoRack
 				}
 			}
 
+			css_exts = Set.new ['css', *@css]
+
+			@public.each { |path|
+				ext = split_extname(path)[1]
+
+				if css_exts.include?(ext)
+					content_write(path, '.css', options) { |template|
+						content = render_css({}, template)
+					}
+				end
+			}
+
 			copy_statics(@root, options)
 		end
 

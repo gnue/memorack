@@ -20,6 +20,7 @@ module MemoRack
 			formats:			['markdown'],
 			css:				nil,
 			suffix:				'',
+			public:				[],
 			directory_watcher:	false
 		}
 
