@@ -329,8 +329,11 @@ module MemoRack
 		end
 
 		# コンテンツファイルの収集する
-		def contents
-			mdmenu = MdMenu.new({prefix: '/', suffix: @suffix, uri_escape: true, formats: collect_formats})
+		def contents(options = {})
+			default_options = {prefix: '/', suffix: @suffix, uri_escape: true, formats: collect_formats}
+			options = default_options.merge(options)
+
+			mdmenu = MdMenu.new(options)
 			Dir.chdir(@root) { |path| mdmenu.collection('.') }
 			mdmenu
 		end
