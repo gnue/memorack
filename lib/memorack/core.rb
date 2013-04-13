@@ -5,6 +5,7 @@ require 'rubygems'
 
 require 'memorack/tilt-mustache'
 require 'memorack/locals'
+require 'memorack/mdmenu'
 
 module MemoRack
 	class Core
@@ -325,6 +326,13 @@ module MemoRack
 		# 対応している拡張子
 		def enable_exts
 			@enable_exts ||= collect_formats.values.flatten
+		end
+
+		# コンテンツファイルの収集する
+		def contents
+			mdmenu = MdMenu.new({prefix: '/', suffix: @suffix, uri_escape: true, formats: collect_formats})
+			Dir.chdir(@root) { |path| mdmenu.collection('.') }
+			mdmenu
 		end
 
 		# テンプレート名

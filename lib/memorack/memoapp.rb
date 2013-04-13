@@ -6,7 +6,6 @@ require 'rack'
 require 'uri'
 
 require 'memorack/core'
-require 'memorack/mdmenu'
 
 module MemoRack
 	class MemoApp < Core
@@ -148,9 +147,7 @@ module MemoRack
 
 		# メニューを作成
 		template :menu do
-			mdmenu = MdMenu.new({prefix: '/', suffix: @suffix, uri_escape: true, formats: collect_formats})
-			Dir.chdir(@root) { |path| mdmenu.collection('.') }
-			mdmenu.generate(StringIO.new).string
+			contents.generate(StringIO.new).string
 		end
 
 	end
