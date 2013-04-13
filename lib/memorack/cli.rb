@@ -293,7 +293,10 @@ module MemoRack
 			require 'tmpdir'
 
 			Dir.mktmpdir do |tmpdir|
-				builder = MemoRack::Builder.new(theme: options[:theme], root: path, tmpdir: tmpdir)
+				site = {}
+				site[:url] = File.join(options[:url], '').gsub(/\/$/, '')
+
+				builder = MemoRack::Builder.new(theme: options[:theme], root: path, tmpdir: tmpdir, site: site)
 				builder.generate(options)
 			end
 
