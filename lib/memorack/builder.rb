@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 
+require 'set'
 require 'fileutils'
 require 'pathname'
 require 'rubygems'
@@ -20,22 +21,24 @@ module MemoRack
 			options = DEFAULT_BUILD_OPTIONS.merge(options)
 			options[:prefix] = File.join(options[:url], '') + options[:prefix] unless options[:url].empty?
 
-			output = options[:output]
-			FileUtils.mkpath(output)
+			FileUtils.mkpath(options[:output])
 
 			@contents = contents(options)
+			@templates = Set.new @contents.files.collect { |file| file[:path] }
 
 			content_write(:index, options) { |template|
 				render_with_mustache template, :markdown
 			}
 
-			@contents.files.each { |file|
-				yield(file) if block_given?
+			@templates.each { |path|
+				yield(path) if block_given?
 
-				content_write(file[:path], options) { |template|
+				content_write(path, options) { |template|
 					render_content({}, template)
 				}
 			}
+
+			copy_statics(@root, options)
 		end
 
 		# コンテンツをファイルに出力する
@@ -54,6 +57,22 @@ module MemoRack
 				File.write(to, content)
 			rescue
 			end
+		end
+
+		# 静的ファイルのコピー
+		def copy_statics(dir, options)
+			output = File.expand_path(options[:output])
+
+			Dir.chdir(dir) { |dir|
+				Dir.glob('**/*') { |path|
+					next if File.directory?(path)
+					next if @templates.include?(path)
+
+					to = File.join(output, path)
+					FileUtils.mkpath(File.dirname(to))
+					FileUtils.copy_entry(path, to)
+				}
+			}
 		end
 
 		#### テンプレート
