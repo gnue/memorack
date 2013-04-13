@@ -106,6 +106,7 @@ class MdMenu
 
 		prefix = @config[:prefix]
 
+		d = File.join(d, '')
 		d.gsub!(/^#{prefix}/, '') if prefix
 		ds = d.scan(/[^\/]+/)
 		ds.delete('.')
