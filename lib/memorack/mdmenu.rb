@@ -18,6 +18,8 @@ class MdMenu
 		'html'		=> ['html', 'htm']
 	}
 
+	attr_reader :files
+
 	def initialize(config)
 		@config = config
 		@file = config[:file]
