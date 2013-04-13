@@ -25,6 +25,10 @@ module MemoRack
 
 			@contents = contents(options)
 
+			content_write(:index, options) { |template|
+				render_with_mustache template, :markdown
+			}
+
 			@contents.files.each { |file|
 				yield(file) if block_given?
 
