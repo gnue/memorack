@@ -1,0 +1,341 @@
+# -*- encoding: utf-8 -*-
+
+require 'pathname'
+require 'rubygems'
+
+require 'memorack/tilt-mustache'
+require 'memorack/locals'
+
+module MemoRack
+	class Core
+		attr_reader :themes, :options_chain
+
+		DEFAULT_APP_OPTIONS = {
+			root:				'content/',
+			themes_folder:		'themes/',
+			tmpdir:				'tmp/',
+			theme:				'basic',
+			markdown:			'redcarpet',
+			formats:			['markdown'],
+			css:				nil,
+			suffix:				'',
+			directory_watcher:	false
+		}
+
+		# テンプレートエンジンのオプション
+		DEFAULT_TEMPLATE_OPTIONS = {
+			tables:			true
+		}
+
+		# テンプレートで使用するローカル変数の初期値
+		DEFAULT_LOCALS = {
+			title:				'memo'
+		}
+
+		DEFAULT_OPTIONS = DEFAULT_APP_OPTIONS.merge(DEFAULT_TEMPLATE_OPTIONS).merge(DEFAULT_LOCALS)
+
+		def initialize(options={})
+			options = DEFAULT_OPTIONS.merge(to_sym_keys(options))
+
+			@themes_folders = [options[:themes_folder], File.expand_path('../themes/', __FILE__)]
+			read_config(options[:theme], options)
+			read_config(DEFAULT_APP_OPTIONS[:theme], options) if @themes.empty?
+
+			@options = options
+
+			# DEFAULT_APP_OPTIONS に含まれるキーをすべてインスタンス変数に登録する
+			DEFAULT_APP_OPTIONS.each { |key, item|
+				instance_variable_set("@#{key}".to_sym, options[key])
+
+				# @options からテンプレートで使わないものを削除
+				@options.delete(key)
+			}
+
+			@locals = default_locals(@options)
+
+			use_engine(@markdown)
+		end
+
+		# テーマのパスを取得する
+		def theme_path(theme)
+			return nil unless theme
+
+			@themes_folders.each { |folder|
+				path = theme && File.join(folder, theme)
+				return path if File.exists?(path) && FileTest::directory?(path)
+			}
+
+			nil
+		end
+
+		# デフォルトの locals を生成する
+		def default_locals(locals = {})
+			locals = Locals[locals]
+
+			locals[:app]			||= Locals[]
+			locals[:app][:name]		||= MemoRack::name
+			locals[:app][:version]	||= MemoRack::VERSION
+			locals[:app][:url]		||= MemoRack::HOMEPAGE
+
+			locals.define_key(:__menu__) { |hash, key|
+				@menu = nil unless @directory_watcher	# ファイル監視していない場合はメニューを初期化
+				@menu ||= render :markdown, :menu, @options
+			}
+
+			locals
+		end
+
+		# 設定ファイルを読込む
+		def read_config(theme, options = {})
+			@themes ||= []
+			@options_chain = []
+			@theme_chain = []
+
+			begin
+				require 'json'
+
+				while theme
+					dir = theme_path(theme)
+					break unless dir
+					break if @themes.member?(dir)
+
+					# テーマ・チェインに追加
+					@themes << File.join(dir, '')
+
+					# config の読込み
+					path = File.join(dir, 'config.json')
+					break unless File.readable?(path)
+
+					data = File.read(path)
+					@options_chain << to_sym_keys(JSON.parse(data))
+
+					theme = @options_chain.last[:theme]
+				end
+			rescue
+			end
+
+			# オプションをマージ
+			@options_chain.reverse.each { |opts| options.merge!(opts) }
+			options
+		end
+
+		# テンプレートエンジンを使用できるようにする
+		def use_engine(engine)
+			require engine if engine
+
+			# Tilt で Redcarpet 2.x を使うためのおまじない
+			Object.send(:remove_const, :RedcarpetCompat) if defined?(RedcarpetCompat) == 'constant'
+		end
+
+		# ファイルを探す
+		def file_search(template, options = {}, exts = enable_exts)
+			options = {views: @root}.merge(options)
+
+			if options[:views].kind_of?(Array)
+				err = nil
+
+				options[:views].each { |views|
+					options[:views] = views
+
+					begin
+						path = file_search(template, options, exts)
+						return path if path
+					rescue Errno::ENOENT => e
+						err = e
+					end
+				}
+
+				raise err if err
+				return nil
+			end
+
+			exts.each { |ext|
+				path = File.join(options[:views], "#{template}.#{ext}")
+				return path if File.exists?(path)
+			}
+
+			return nil
+		end
+
+		# テンプレートエンジンで render する
+		def render(engine, template, options = {}, locals = {})
+			options = {views: @root}.merge(options)
+
+			if template.kind_of?(Pathname)
+				path = template
+			elsif options[:views].kind_of?(Array)
+				err = nil
+
+				options[:views].each { |views|
+					options[:views] = views
+
+					begin
+						return render(engine, template, options, locals)
+					rescue Errno::ENOENT => e
+						err = e
+					end
+				}
+
+				raise err
+			else
+				fname = template.kind_of?(String) ? template : "#{template}.#{engine}"
+				path = File.join(options[:views], fname)
+			end
+
+			engine = Tilt.new(File.join(File.dirname(path), ".#{engine}"), options) {
+				method = MemoApp.template_method(template)
+
+				if method && respond_to?(method)
+					data = send(method)
+				else
+					data = File.binread(path)
+					data.force_encoding('UTF-8')
+				end
+
+				data
+			}
+			engine.render(options, locals).force_encoding('UTF-8')
+		end
+
+		# レイアウトに mustache を適用してテンプレートエンジンでレンダリングする
+		def render_with_mustache(template, engine = :markdown, options = {}, locals = {})
+			begin
+				mustache_templ = options[:mustache] || 'index.html'
+
+				options = @options.merge(options)
+				locals = @locals.merge(locals)
+
+				locals.define_key(:__content__) { |hash, key|
+					if engine
+						render engine, template, options
+					else
+						template
+					end
+				}
+
+				locals[:content] = true unless template == :index
+				locals[:page] = page = Locals[locals[:page] || {}]
+
+				page.define_key(:name) { |hash, key|
+					unless template == :index
+						fname = locals[:path_info]
+						fname ||= template.to_s.force_encoding('UTF-8')
+						File.basename(fname)
+					end
+				}
+
+				page.define_key(:title) { |hash, key|
+					page_title = home_title = locals[:title]
+					page_name = hash[:name]
+					page_title = "#{page_name} | #{home_title}" if page_name
+
+					page_title
+				}
+
+				render :mustache, mustache_templ, {views: @themes}, locals
+			rescue => e
+				e.to_s
+			end
+		end
+
+		# コンテンツをレンダリングする
+		def render_content(env, path_info)
+			path, ext = split_extname(path_info)
+
+			if @suffix == ''
+				fullpath = file_search(path_info, @options)
+
+				if fullpath
+					path = path_info
+					ext = split_extname(fullpath)[1]
+				end
+			end
+
+			return nil unless ext && Tilt.registered?(ext)
+
+			locals = {env: env, path_info: path_info}
+
+			template = fullpath ? Pathname.new(fullpath) : path.to_sym
+			content = render_with_mustache template, ext, {}, locals
+		end
+
+		# CSSをレンダリングする
+		def render_css(env, path_info)
+			return unless @css
+
+			exts = @css
+			exts = [exts] unless exts.kind_of?(Array)
+			path, = split_extname(path_info)
+			options = {views: @themes}
+
+			fullpath = file_search(path, options, exts)
+			return nil unless fullpath
+
+			ext = split_extname(fullpath)[1]
+
+			case ext
+			when 'scss', 'sass'
+				options[:cache_location] = File.expand_path('sass-cache', @tmpdir)
+			end
+
+			render ext, Pathname.new(fullpath), options
+		end
+
+		# 拡張子を取出す
+		def split_extname(path)
+			return [$1, $2] if /^(.+)\.([^.]+)/ =~ path
+
+			[path]
+		end
+
+		# キーをシンボルに変換する
+		def to_sym_keys(hash)
+			hash.inject({}) { |memo, entry|
+				key, value = entry
+				memo[key.to_sym] = value
+				memo
+			}
+		end
+
+		# Tilt に登録されている拡張子を集める
+		def extnames(extname)
+			klass = Tilt[extname]
+			Tilt.mappings.select { |key, value| value.member?(klass) }.collect { |key, value| key }
+		end
+
+		# 対応フォーマットを取得する
+		def collect_formats
+			unless @collect_formats
+				@collect_formats = {}
+
+				@formats.each { |item|
+					if item.kind_of?(Array)
+						@collect_formats[item.first] = item
+					elsif item.kind_of?(Hash)
+						@collect_formats.merge!(item)
+					else
+						@collect_formats[item] = extnames(item)
+					end
+				}
+			end
+
+			@collect_formats
+		end
+
+		# 対応している拡張子
+		def enable_exts
+			@enable_exts ||= collect_formats.values.flatten
+		end
+
+		# テンプレート名
+		def self.template_method(name)
+			name.kind_of?(Symbol) && "template_#{name}".to_sym
+		end
+
+		# テンプレートを作成する
+		def self.template(name, &block)
+			define_method(self.template_method(name), &block)
+		end
+
+	end
+end
