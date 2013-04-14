@@ -21,6 +21,7 @@ module MemoRack
 			css:				nil,
 			suffix:				'',
 			public:				[],
+			site:				{},
 			directory_watcher:	false
 		}
 
@@ -73,6 +74,8 @@ module MemoRack
 		# デフォルトの locals を生成する
 		def default_locals(locals = {})
 			locals = Locals[locals]
+
+			locals[:site]			||= @site
 
 			locals[:app]			||= Locals[]
 			locals[:app][:name]		||= MemoRack::name
@@ -302,7 +305,10 @@ module MemoRack
 		def to_sym_keys(hash)
 			hash.inject({}) { |memo, entry|
 				key, value = entry
+				value = to_sym_keys(value) if value.kind_of?(Hash)
+
 				memo[key.to_sym] = value
+
 				memo
 			}
 		end

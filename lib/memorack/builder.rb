@@ -19,7 +19,9 @@ module MemoRack
 
 		def generate(options = {}, &callback)
 			options = DEFAULT_BUILD_OPTIONS.merge(options)
-			options[:prefix] = File.join(options[:url], '') + options[:prefix] unless options[:url].empty?
+
+			url = @site[:url]
+			options[:prefix] = File.join(url, '') + options[:prefix] unless url.empty?
 
 			output = File.expand_path(options[:output])
 			dir_init(output)

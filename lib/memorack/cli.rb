@@ -300,7 +300,7 @@ module MemoRack
 
 			Dir.mktmpdir do |tmpdir|
 				site = {}
-				site[:url] = File.join(options[:url], '').gsub(/\/$/, '')
+				site[:url] = File.join(options[:url], '').gsub(/\/$/, '') if options[:url]
 
 				builder = MemoRack::Builder.new(theme: options[:theme], root: path, tmpdir: tmpdir, site: site)
 				builder.generate(options)
