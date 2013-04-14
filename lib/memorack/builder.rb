@@ -21,7 +21,8 @@ module MemoRack
 			options = DEFAULT_BUILD_OPTIONS.merge(options)
 			options[:prefix] = File.join(options[:url], '') + options[:prefix] unless options[:url].empty?
 
-			FileUtils.mkpath(options[:output])
+			output = File.expand_path(options[:output])
+			FileUtils.mkpath(output)
 
 			@contents = contents(options)
 			@templates = Set.new @contents.files.collect { |file| file[:path] }
@@ -50,7 +51,7 @@ module MemoRack
 				end
 			}
 
-			copy_statics(@root, options)
+			copy_statics(@root, output)
 		end
 
 		# コンテンツをファイルに出力する
@@ -71,18 +72,21 @@ module MemoRack
 			end
 		end
 
-		# 静的ファイルのコピー
-		def copy_statics(dir, options)
-			output = File.expand_path(options[:output])
+		# ファイルをコピーする
+		def copy_file(path, output)
+			return if File.directory?(path)
+			return if @templates.include?(path)
 
+			to = File.join(output, path)
+			FileUtils.mkpath(File.dirname(to))
+			FileUtils.copy_entry(path, to)
+		end
+
+		# 静的ファイルのコピー
+		def copy_statics(dir, output)
 			Dir.chdir(dir) { |dir|
 				Dir.glob('**/*') { |path|
-					next if File.directory?(path)
-					next if @templates.include?(path)
-
-					to = File.join(output, path)
-					FileUtils.mkpath(File.dirname(to))
-					FileUtils.copy_entry(path, to)
+					copy_file(path, output)
 				}
 			}
 		end
