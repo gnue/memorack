@@ -27,10 +27,12 @@ module MemoRack
 			@contents = contents(options)
 			@templates = Set.new @contents.files.collect { |file| file[:path] }
 
+			# トップページを作成する
 			content_write(:index, options[:suffix], output) { |template|
 				render_with_mustache template, :markdown
 			}
 
+			# コンテンツのレンダリングを行う
 			@templates.each { |path|
 				yield(path) if block_given?
 
@@ -39,19 +41,10 @@ module MemoRack
 				}
 			}
 
-			public_files.each { |path_info|
-				ext = split_extname(path_info)[1]
+			# テーマの公開ファイルをコピー
+			copy_public(@themes, output)
 
-				if css_exts.include?(ext)
-					content_write(path_info, '.css', output) { |template|
-						content = render_css({}, template)
-					}
-				else
-					fullpath = file_search(path_info, {views: @themes}, nil)
-					copy_file(fullpath, [output, path_info]) if fullpath
-				end
-			}
-
+			# 静的ファイルをコピーする
 			copy_statics(@root, output)
 		end
 
@@ -111,12 +104,28 @@ module MemoRack
 			FileUtils.copy_entry(path, to)
 		end
 
-		# 静的ファイルのコピー
+		# 静的ファイルをコピーする
 		def copy_statics(dir, output)
 			Dir.chdir(dir) { |dir|
 				Dir.glob('**/*') { |path|
 					copy_file(path, output)
 				}
+			}
+		end
+
+		# テーマの公開ファイルをコピーする
+		def copy_public(views, output)
+			public_files.each { |path_info|
+				ext = split_extname(path_info)[1]
+
+				if css_exts.include?(ext)
+					content_write(path_info, '.css', output) { |template|
+						content = render_css({}, template)
+					}
+				else
+					fullpath = file_search(path_info, {views: views}, nil)
+					copy_file(fullpath, [output, path_info]) if fullpath
+				end
 			}
 		end
 
