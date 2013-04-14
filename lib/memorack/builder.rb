@@ -22,7 +22,7 @@ module MemoRack
 			options[:prefix] = File.join(options[:url], '') + options[:prefix] unless options[:url].empty?
 
 			output = File.expand_path(options[:output])
-			FileUtils.mkpath(output)
+			dir_init(output)
 
 			@contents = contents(options)
 			@templates = Set.new @contents.files.collect { |file| file[:path] }
@@ -46,6 +46,19 @@ module MemoRack
 
 			# 静的ファイルをコピーする
 			copy_statics(@root, output, &callback)
+		end
+
+		# ディレクトリを初期化する
+		def dir_init(dir)
+			if Dir.exists?(dir)
+				Dir.glob(File.join(dir, '*'), File::FNM_DOTMATCH) { |path|
+					next if /(^|\/)(\.|\.\.)$/ =~ path
+
+					FileUtils.remove_entry_secure(path)
+				}
+			else
+				FileUtils.mkpath(dir)
+			end
 		end
 
 		# テーマから公開用のファイルを収集する
