@@ -178,7 +178,7 @@ module MemoRack
 		# 静的サイトのビルド
 		define_options(:build, '[options] [PATH]') { |opts, argv, options|
 			default_options = {
-					output:	'site',
+					output:	'_site',
 					theme:	'custom',
 					url:	'',
 

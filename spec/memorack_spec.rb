@@ -98,7 +98,7 @@ describe MemoRack do
 				proc { memorack 'build', '-h' }.must_output nil, <<-EOD.cut_indent
 					Usage: memorack build [options] [PATH]
 
-					    -o, --output DIRECTORY           Output directory (default: site)
+					    -o, --output DIRECTORY           Output directory (default: _site)
 					    -t, --theme THEME                use THEME (default: custom)
 					        --url URL                    Site URL (default: )
 					        --local                      Site URL is output directory
@@ -156,7 +156,7 @@ describe MemoRack do
 				proc { memorack 'build', '-h' }.must_output nil, <<-EOD.cut_indent
 					Usage: memorack build [options] [PATH]
 
-					    -o, --output DIRECTORY           出力するディレクトリ (省略値: site)
+					    -o, --output DIRECTORY           出力するディレクトリ (省略値: _site)
 					    -t, --theme THEME                テーマを使う (省略値: custom)
 					        --url URL                    サイトURL (省略値: )
 					        --local                      サイトURLをアウトプットディレクトリにする

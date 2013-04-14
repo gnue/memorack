@@ -11,7 +11,7 @@ module MemoRack
 	class Builder < Core
 
 		DEFAULT_BUILD_OPTIONS = {
-			output:		'site',
+			output:		'_site',
 			prefix:		'',
 			suffix:		'.html',
 			uri_escape:	true,
