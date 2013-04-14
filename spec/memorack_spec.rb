@@ -93,6 +93,18 @@ describe MemoRack do
 					    -h, --help                       Show this message
 				EOD
 			end
+
+			it "build" do
+				proc { memorack 'build', '-h' }.must_output nil, <<-EOD.cut_indent
+					Usage: memorack build [options] [PATH]
+
+					    -o, --output DIRECTORY           Output directory (default: site)
+					    -t, --theme THEME                use THEME (default: custom)
+					        --url URL                    Site URL (default: )
+					        --local                      Site URL is output directory
+					    -h, --help                       Show this message
+				EOD
+			end
 		end
 
 		describe "ja" do
@@ -135,6 +147,18 @@ describe MemoRack do
 
 					    -p, --port PORT                  ポートを使う (省略値: 9292)
 					    -t, --theme THEME                テーマを使う (省略値: oreilly)
+					    -h, --help                       このメッセージを表示
+				EOD
+			end
+
+			it "build" do
+				proc { memorack 'build', '-h' }.must_output nil, <<-EOD.cut_indent
+					Usage: memorack build [options] [PATH]
+
+					    -o, --output DIRECTORY           出力するディレクトリ (省略値: site)
+					    -t, --theme THEME                テーマを使う (省略値: custom)
+					        --url URL                    サイトURL (省略値: )
+					        --local                      サイトURLをアウトプットディレクトリにする
 					    -h, --help                       このメッセージを表示
 				EOD
 			end
