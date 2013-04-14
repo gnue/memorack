@@ -27,14 +27,14 @@ module MemoRack
 			@contents = contents(options)
 			@templates = Set.new @contents.files.collect { |file| file[:path] }
 
-			content_write(:index, options[:suffix], options) { |template|
+			content_write(:index, options[:suffix], output) { |template|
 				render_with_mustache template, :markdown
 			}
 
 			@templates.each { |path|
 				yield(path) if block_given?
 
-				content_write(path, options[:suffix], options) { |template|
+				content_write(path, options[:suffix], output) { |template|
 					render_content({}, template)
 				}
 			}
@@ -43,7 +43,7 @@ module MemoRack
 				ext = split_extname(path_info)[1]
 
 				if css_exts.include?(ext)
-					content_write(path_info, '.css', options) { |template|
+					content_write(path_info, '.css', output) { |template|
 						content = render_css({}, template)
 					}
 				else
@@ -79,7 +79,7 @@ module MemoRack
 		end
 
 		# コンテンツをファイルに出力する
-		def content_write(template, suffix, options)
+		def content_write(template, suffix, output)
 			begin
 				content = yield(template)
 				return unless content
@@ -88,7 +88,7 @@ module MemoRack
 				path = path.sub(/\.[^.]*$/, '') if path.kind_of?(String)
 
 				to = path.to_s + suffix
-				to = File.join(options[:output], to)
+				to = File.join(output, to)
 
 				FileUtils.mkpath(File.dirname(to))
 				File.write(to, content)
