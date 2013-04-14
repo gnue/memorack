@@ -41,13 +41,16 @@ module MemoRack
 
 			css_exts = Set.new ['css', *@css]
 
-			@public.each { |path|
-				ext = split_extname(path)[1]
+			@public.each { |path_info|
+				ext = split_extname(path_info)[1]
 
 				if css_exts.include?(ext)
-					content_write(path, '.css', options) { |template|
+					content_write(path_info, '.css', options) { |template|
 						content = render_css({}, template)
 					}
+				else
+					fullpath = file_search(path_info, {views: @themes}, nil)
+					copy_file(fullpath, [output, path_info]) if fullpath
 				end
 			}
 
@@ -77,7 +80,12 @@ module MemoRack
 			return if File.directory?(path)
 			return if @templates.include?(path)
 
-			to = File.join(output, path)
+			if output.kind_of?(Array)
+				to = File.join(*output)
+			else
+				to = File.join(output, path)
+			end
+
 			FileUtils.mkpath(File.dirname(to))
 			FileUtils.copy_entry(path, to)
 		end
