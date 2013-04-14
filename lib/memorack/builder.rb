@@ -41,7 +41,7 @@ module MemoRack
 
 			css_exts = Set.new ['css', *@css]
 
-			@public.each { |path_info|
+			public_files.each { |path_info|
 				ext = split_extname(path_info)[1]
 
 				if css_exts.include?(ext)
@@ -55,6 +55,29 @@ module MemoRack
 			}
 
 			copy_statics(@root, output)
+		end
+
+		# テーマから公開用のファイルを収集する
+		def public_files
+			unless @public_files
+				@public_files = Set.new
+
+				@public.each { |path_info|
+					if path_info[-1] == '/'
+						fullpath = file_search(path_info, {views: @themes}, nil)
+						if fullpath
+							dir = fullpath.gsub(/#{path_info}$/, '')
+							Dir.chdir(dir) { |dir|
+								@public_files += Dir.glob(File.join(path_info, '**/*'))
+							}
+						end
+					else
+						@public_files << path_info
+					end
+				}
+			end
+
+			@public_files
 		end
 
 		# コンテンツをファイルに出力する
