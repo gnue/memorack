@@ -22,6 +22,7 @@ module MemoRack
 			suffix:				'',
 			public:				[],
 			site:				{},
+			requires:			[],
 			directory_watcher:	false
 		}
 
@@ -54,6 +55,7 @@ module MemoRack
 				@options.delete(key)
 			}
 
+			@requires.each { |lib| require lib }
 			@locals = default_locals(@options)
 
 			use_engine(@markdown)
