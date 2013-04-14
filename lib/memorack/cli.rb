@@ -181,6 +181,8 @@ module MemoRack
 					output:	'site',
 					theme:	'custom',
 					url:	'',
+
+					local:		false,
 				}
 
 			options.merge!(default_options)
@@ -192,9 +194,13 @@ module MemoRack
 				t(:theme, options)) { |arg| options[:theme] = arg }
 			opts.on("--url URL", String,
 				t(:url, options)) { |arg| options[:url] = arg }
+			opts.on("--local",
+				t(:local)) { options[:local] = true }
 			opts.on("-h", "--help", t(:help)) { abort opts.help }
 
 			opts.parse!(argv)
+
+			options[:url] = 'file://' + File.expand_path(options[:output]) if options[:local]
 		}
 
 

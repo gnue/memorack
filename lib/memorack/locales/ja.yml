@@ -7,3 +7,4 @@ ja:
     theme: "テーマを使う (省略値: %{theme})"
     output: "出力するディレクトリ (省略値: %{output})"
     url:    "サイトURL (省略値: %{url})"
+    local:  "サイトURLをアウトプットディレクトリにする"

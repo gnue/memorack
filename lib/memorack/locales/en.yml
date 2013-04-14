@@ -7,3 +7,4 @@ en:
     theme: "use THEME (default: %{theme})"
     output: "Output directory (default: %{output})"
     url:    "Site URL (default: %{url})"
+    local:  "Site URL is output directory"
