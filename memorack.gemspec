@@ -30,6 +30,8 @@ Gem::Specification.new do |gem|
   gem.add_dependency('i18n')
 
   # for development
+  gem.add_development_dependency('bundler', '~> 1.3')
+  gem.add_development_dependency('rake')
   gem.add_development_dependency('minitest')
   gem.add_development_dependency('turn')
 
