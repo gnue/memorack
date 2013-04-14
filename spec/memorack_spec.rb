@@ -102,6 +102,7 @@ describe MemoRack do
 					    -t, --theme THEME                use THEME (default: custom)
 					        --url URL                    Site URL (default: )
 					        --local                      Site URL is output directory
+					        --prettify                   prettify URL
 					    -h, --help                       Show this message
 				EOD
 			end
@@ -159,6 +160,7 @@ describe MemoRack do
 					    -t, --theme THEME                テーマを使う (省略値: custom)
 					        --url URL                    サイトURL (省略値: )
 					        --local                      サイトURLをアウトプットディレクトリにする
+					        --prettify                   綺麗なURLになるように生成する
 					    -h, --help                       このメッセージを表示
 				EOD
 			end

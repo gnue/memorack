@@ -183,6 +183,7 @@ module MemoRack
 					url:	'',
 
 					local:		false,
+					prettify:	false,
 				}
 
 			options.merge!(default_options)
@@ -196,11 +197,14 @@ module MemoRack
 				t(:url, options)) { |arg| options[:url] = arg }
 			opts.on("--local",
 				t(:local)) { options[:local] = true }
+			opts.on("--prettify",
+				t(:prettify)) { options[:prettify] = true }
 			opts.on("-h", "--help", t(:help)) { abort opts.help }
 
 			opts.parse!(argv)
 
 			options[:url] = 'file://' + File.expand_path(options[:output]) if options[:local]
+			options[:suffix] = '' if options[:prettify]
 		}
 
 
