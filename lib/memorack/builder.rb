@@ -17,7 +17,7 @@ module MemoRack
 			uri_escape:	true,
 		}
 
-		def generate(options = {})
+		def generate(options = {}, &callback)
 			options = DEFAULT_BUILD_OPTIONS.merge(options)
 			options[:prefix] = File.join(options[:url], '') + options[:prefix] unless options[:url].empty?
 
@@ -34,7 +34,7 @@ module MemoRack
 
 			# コンテンツのレンダリングを行う
 			@templates.each { |path|
-				yield(path) if block_given?
+				callback.call(path) if callback
 
 				content_write(path, options[:suffix], output) { |template|
 					render_content({}, template)
@@ -42,10 +42,10 @@ module MemoRack
 			}
 
 			# テーマの公開ファイルをコピー
-			copy_public(@themes, output)
+			copy_public(@themes, output, &callback)
 
 			# 静的ファイルをコピーする
-			copy_statics(@root, output)
+			copy_statics(@root, output, &callback)
 		end
 
 		# テーマから公開用のファイルを収集する
@@ -90,9 +90,11 @@ module MemoRack
 		end
 
 		# ファイルをコピーする
-		def copy_file(path, output)
+		def copy_file(path, output, &callback)
 			return if File.directory?(path)
 			return if @templates.include?(path)
+
+			callback.call(path) if callback
 
 			if output.kind_of?(Array)
 				to = File.join(*output)
@@ -105,17 +107,19 @@ module MemoRack
 		end
 
 		# 静的ファイルをコピーする
-		def copy_statics(dir, output)
+		def copy_statics(dir, output, &callback)
 			Dir.chdir(dir) { |dir|
 				Dir.glob('**/*') { |path|
-					copy_file(path, output)
+					copy_file(path, output, &callback)
 				}
 			}
 		end
 
 		# テーマの公開ファイルをコピーする
-		def copy_public(views, output)
+		def copy_public(views, output, &callback)
 			public_files.each { |path_info|
+				callback.call(path_info) if callback
+
 				ext = split_extname(path_info)[1]
 
 				if css_exts.include?(ext)
