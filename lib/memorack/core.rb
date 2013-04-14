@@ -251,7 +251,7 @@ module MemoRack
 		end
 
 		# コンテンツをレンダリングする
-		def render_content(env, path_info)
+		def render_content(path_info, locals = {})
 			path, ext = split_extname(path_info)
 
 			if @suffix == ''
@@ -265,14 +265,12 @@ module MemoRack
 
 			return nil unless ext && Tilt.registered?(ext)
 
-			locals = {env: env, path_info: path_info}
-
 			template = fullpath ? Pathname.new(fullpath) : path.to_sym
 			content = render_with_mustache template, ext, {}, locals
 		end
 
 		# CSSをレンダリングする
-		def render_css(env, path_info)
+		def render_css(path_info, locals = {})
 			return unless @css
 
 			path, = split_extname(path_info)
@@ -290,7 +288,7 @@ module MemoRack
 				options[:cache_location] = File.expand_path('sass-cache', @tmpdir)
 			end
 
-			render ext, Pathname.new(fullpath), options
+			render ext, Pathname.new(fullpath), options, locals
 		end
 
 		# 拡張子を取出す

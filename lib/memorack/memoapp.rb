@@ -34,12 +34,13 @@ module MemoRack
 
 				begin
 					content_type = 'text/css'
-					content = render_css(env, path_info)
+					content = render_css(path_info)
 				rescue Errno::ENOENT => e
 					return error(env, 404)
 				end
 			else
-				content = render_content(env, path_info)
+				locals = {env: env, path_info: path_info}
+				content = render_content(path_info, locals)
 			end
 
 			return [200, {'Content-Type' => content_type}, [content.to_s]] if content

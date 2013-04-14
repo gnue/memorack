@@ -37,7 +37,7 @@ module MemoRack
 				callback.call(path) if callback
 
 				content_write(path, options[:suffix], output) { |template|
-					render_content({}, template)
+					render_content(template)
 				}
 			}
 
@@ -124,7 +124,7 @@ module MemoRack
 
 				if css_exts.include?(ext)
 					content_write(path_info, '.css', output) { |template|
-						content = render_css({}, template)
+						content = render_css(template)
 					}
 				else
 					fullpath = file_search(path_info, {views: views}, nil)
