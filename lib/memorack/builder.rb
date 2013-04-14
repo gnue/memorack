@@ -30,15 +30,18 @@ module MemoRack
 			@templates = Set.new @contents.files.collect { |file| file[:path] }
 
 			# トップページを作成する
-			content_write(:index, options[:suffix], output) { |template|
+			content_write(:index, '.html', output) { |template|
 				render_with_mustache template, :markdown
 			}
+
+			suffix = options[:suffix]
+			suffix = '/index.html' if ['', '/'].member?(suffix)
 
 			# コンテンツのレンダリングを行う
 			@templates.each { |path|
 				callback.call(path) if callback
 
-				content_write(path, options[:suffix], output) { |template|
+				content_write(path, suffix, output) { |template|
 					render_content(template)
 				}
 			}
