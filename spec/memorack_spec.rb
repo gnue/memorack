@@ -236,13 +236,14 @@ describe MemoRack do
 
 				`cd themes/#{theme}; find . -print`.must_equal <<-EOD.cut_indent
 					.
-					./2-column.scss
 					./404.md
-					./basic-styles.scss
 					./config.json
+					./css
+					./css/2-column.scss
+					./css/basic-styles.scss
+					./css/styles.scss
 					./error.html
 					./index.html
-					./styles.scss
 				EOD
 			}
 		end
