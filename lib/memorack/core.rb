@@ -129,6 +129,11 @@ module MemoRack
 			Object.send(:remove_const, :RedcarpetCompat) if defined?(RedcarpetCompat) == 'constant'
 		end
 
+		# css の拡張子リストを作成する
+		def css_exts
+			@css_exts ||= Set.new ['css', *@css]
+		end
+
 		# ファイルを探す
 		def file_search(template, options = {}, exts = enable_exts)
 			options = {views: @root}.merge(options)
@@ -268,11 +273,12 @@ module MemoRack
 
 		# CSSをレンダリングする
 		def render_css(env, path_info)
-			exts = Set.new ['css', *@css]
+			return unless @css
+
 			path, = split_extname(path_info)
 			options = {views: @themes}
 
-			fullpath = file_search(path, options, exts)
+			fullpath = file_search(path, options, css_exts)
 			return nil unless fullpath
 
 			ext = split_extname(fullpath)[1]

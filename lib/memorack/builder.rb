@@ -39,8 +39,6 @@ module MemoRack
 				}
 			}
 
-			css_exts = Set.new ['css', *@css]
-
 			public_files.each { |path_info|
 				ext = split_extname(path_info)[1]
 
