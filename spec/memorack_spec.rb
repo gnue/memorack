@@ -262,10 +262,84 @@ describe MemoRack do
 	end
 
 	describe "build" do
-		it "build"
-		it "build PATH"
-		it "build --output DIRECTORY"
-		it "build --theme THEME"
+		before do
+			@hash = {}
+			@hash['basic']		= 'd414b3942f61e6b0a07f6458bfb133da40e7c7b8'
+			@hash['oreilly']	= '56b0c0f6a7394904442d7af6986797b1300301c3'
+
+			@file_lists = <<-EOD.cut_indent
+				.
+				./css
+				./css/2-column.css
+				./css/basic-styles.css
+				./css/styles.css
+				./index.html
+				./README.html
+			EOD
+		end
+
+		it "build" do
+			theme  = 'oreilly'
+			output = '_site'
+
+			chmemo { |name|
+				proc { memorack 'build' }.must_output "Build 'content/' -> '#{output}'\n"
+
+				Dir.chdir(output) { |output|
+					`find . -print`.must_equal @file_lists
+					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
+				}
+			}
+		end
+
+		it "build PATH" do
+			theme  = 'basic'
+			output = '_site'
+
+			chmemo { |name|
+				dirname = 'data'
+				File.rename('content', dirname)
+
+				Dir.chdir('..')
+
+				path = File.join(name, dirname)
+				proc { memorack 'build', path }.must_output "Build '#{path}' -> '#{output}'\n"
+
+				Dir.chdir(output) { |output|
+					`find . -print`.must_equal @file_lists
+					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
+				}
+			}
+		end
+
+		it "build --output DIRECTORY" do
+			theme  = 'oreilly'
+			output = 'output'
+
+			chmemo { |name|
+				proc { memorack 'build', '--output', output }.must_output "Build 'content/' -> '#{output}'\n"
+
+				Dir.chdir(output) { |output|
+					`find . -print`.must_equal @file_lists
+					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
+				}
+			}
+		end
+
+		it "build --theme THEME" do
+			theme  = 'basic'
+			output = '_site'
+
+			chmemo { |name|
+				proc { memorack 'build', '--theme', theme }.must_output "Build 'content/' -> '#{output}'\n"
+
+				Dir.chdir(output) { |output|
+					`find . -print`.must_equal @file_lists
+					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
+				}
+			}
+		end
+
 		it "build --url URL"
 		it "build --local"
 		it "build --prettify"
