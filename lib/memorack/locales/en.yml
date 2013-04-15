@@ -5,3 +5,7 @@ en:
     dir:   "Theme directory (default: %{dir})"
     port:  "use PORT (default: %{Port})"
     theme: "use THEME (default: %{theme})"
+    output: "Output directory (default: %{output})"
+    url:    "Site URL (default: %{url})"
+    local:  "Site URL is output directory"
+    prettify: "prettify URL"

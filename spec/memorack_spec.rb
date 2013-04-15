@@ -61,6 +61,7 @@ describe MemoRack do
 					Usage: memorack create [options] PATH
 					       memorack theme  [options] [THEME]
 					       memorack server [options] PATH
+					       memorack build  [options] [PATH]
 
 					    -h, --help                       Show this message
 				EOD
@@ -92,6 +93,19 @@ describe MemoRack do
 					    -h, --help                       Show this message
 				EOD
 			end
+
+			it "build" do
+				proc { memorack 'build', '-h' }.must_output nil, <<-EOD.cut_indent
+					Usage: memorack build [options] [PATH]
+
+					    -o, --output DIRECTORY           Output directory (default: _site)
+					    -t, --theme THEME                use THEME (default: custom)
+					        --url URL                    Site URL (default: )
+					        --local                      Site URL is output directory
+					        --prettify                   prettify URL
+					    -h, --help                       Show this message
+				EOD
+			end
 		end
 
 		describe "ja" do
@@ -104,6 +118,7 @@ describe MemoRack do
 					Usage: memorack create [options] PATH
 					       memorack theme  [options] [THEME]
 					       memorack server [options] PATH
+					       memorack build  [options] [PATH]
 
 					    -h, --help                       このメッセージを表示
 				EOD
@@ -133,6 +148,19 @@ describe MemoRack do
 
 					    -p, --port PORT                  ポートを使う (省略値: 9292)
 					    -t, --theme THEME                テーマを使う (省略値: oreilly)
+					    -h, --help                       このメッセージを表示
+				EOD
+			end
+
+			it "build" do
+				proc { memorack 'build', '-h' }.must_output nil, <<-EOD.cut_indent
+					Usage: memorack build [options] [PATH]
+
+					    -o, --output DIRECTORY           出力するディレクトリ (省略値: _site)
+					    -t, --theme THEME                テーマを使う (省略値: custom)
+					        --url URL                    サイトURL (省略値: )
+					        --local                      サイトURLをアウトプットディレクトリにする
+					        --prettify                   綺麗なURLになるように生成する
 					    -h, --help                       このメッセージを表示
 				EOD
 			end
@@ -210,13 +238,14 @@ describe MemoRack do
 
 				`cd themes/#{theme}; find . -print`.must_equal <<-EOD.cut_indent
 					.
-					./2-column.scss
 					./404.md
-					./basic-styles.scss
 					./config.json
+					./css
+					./css/2-column.scss
+					./css/basic-styles.scss
+					./css/styles.scss
 					./error.html
 					./index.html
-					./styles.scss
 				EOD
 			}
 		end

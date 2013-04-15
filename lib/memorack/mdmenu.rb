@@ -18,6 +18,8 @@ class MdMenu
 		'html'		=> ['html', 'htm']
 	}
 
+	attr_reader :files
+
 	def initialize(config)
 		@config = config
 		@file = config[:file]
@@ -104,6 +106,7 @@ class MdMenu
 
 		prefix = @config[:prefix]
 
+		d = File.join(d, '')
 		d.gsub!(/^#{prefix}/, '') if prefix
 		ds = d.scan(/[^\/]+/)
 		ds.delete('.')
