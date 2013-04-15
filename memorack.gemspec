@@ -34,6 +34,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency('rake')
   gem.add_development_dependency('minitest')
   gem.add_development_dependency('turn')
+  gem.add_development_dependency('rack-test')
 
   gem.post_install_message = %Q{
     ==================

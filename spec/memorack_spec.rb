@@ -401,7 +401,36 @@ describe MemoRack do
 	end
 
 	describe "server" do
-		it "server"
+		include Rack::Test::Methods
+
+		before do
+			@cwd = Dir.pwd
+
+			name = 'memo'
+			Dir.chdir(@tmpdir)
+			proc { memorack 'create', name }.must_output "Created '#{name}'\n"
+			Dir.chdir(name)
+		end
+
+		def app
+			Rack::Builder.parse_file('config.ru').first
+		end
+
+		it "server /" do
+			get '/'
+			last_response.must_be :ok?
+			last_response.body.must_match /Powered by <a href="#{MemoRack::HOMEPAGE}"[^>]*>/
+		end
+
+		it "server /README" do
+			get '/README'
+			last_response.must_be :ok?
+			last_response.body.must_match /このディレクトリに markdown 等のメモファイルを作成してください/
+		end
+
+		after do
+			Dir.chdir(@cwd)
+		end
 	end
 
 	after do
