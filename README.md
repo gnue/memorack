@@ -23,6 +23,7 @@ Or install it yourself as:
 	$ memorack theme THEME				# Show theme info
 	$ memorack theme -c THEME			# Copy theme
 	$ memorack server PATH				# Instant Server
+	$ memorack build [PATH]				# Build static site
 
 Standard startup
 
@@ -48,6 +49,14 @@ OS X (Pow + powder)
 
 * [Pow: Zero-configuration Rack server for Mac OS X](http://pow.cx)
 * `gem install powder`
+
+Build static site
+
+	$ memorack create memo
+	$ cd memo
+	(Customizing...)
+	$ memorack build --url http://foo.bar.baz
+	Build 'content/' -> '_site'
 
 ## Directory
 
@@ -115,6 +124,7 @@ Add code to `index.html`
 
 Basic variables -- `{{VAR}}`
 
+* `site.url`
 * `title`
 * `page.title`
 * `app.name`
@@ -131,8 +141,7 @@ Special variables -- `{{{VAR}}}`
 
 * Template comments translate english
 * Add customizing tips
-* Server test program
-* Generate HTMLs for static site
+* More test program
 * Plugin
 
 ## Contributing
