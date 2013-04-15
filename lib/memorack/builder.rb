@@ -64,13 +64,13 @@ module MemoRack
 
 				@public.each { |path_info|
 					if path_info[-1] == '/'
-						fullpath = file_search(path_info, {views: @themes}, nil)
-						if fullpath
-							dir = fullpath.gsub(/#{path_info}$/, '')
-							Dir.chdir(dir) { |dir|
-								@public_files += Dir.glob(File.join(path_info, '**/*'))
-							}
-						end
+						@themes.each { |theme|
+							if Dir.exists?(File.join(theme, path_info))
+								Dir.chdir(theme) { |dir|
+									@public_files += Dir.glob(File.join(path_info, '**/*'))
+								}
+							end
+						}
 					else
 						@public_files << path_info
 					end
