@@ -258,10 +258,179 @@ describe MemoRack do
 				proc { memorack 'theme', '-c', File.join(theme, fname) }.must_output "Created '#{fname}'\n"
 			}
 		end
+
+	end
+
+	describe "build" do
+		before do
+			@hash = {}
+			@hash['basic']		= 'd414b3942f61e6b0a07f6458bfb133da40e7c7b8'
+			@hash['oreilly']	= '56b0c0f6a7394904442d7af6986797b1300301c3'
+
+			@file_lists = <<-EOD.cut_indent
+				.
+				./css
+				./css/2-column.css
+				./css/basic-styles.css
+				./css/styles.css
+				./index.html
+				./README.html
+			EOD
+		end
+
+		it "build" do
+			theme  = 'oreilly'
+			output = '_site'
+
+			chmemo { |name|
+				proc { memorack 'build' }.must_output "Build 'content/' -> '#{output}'\n"
+
+				Dir.chdir(output) { |output|
+					`find . -print`.must_equal @file_lists
+					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
+				}
+			}
+		end
+
+		it "build PATH" do
+			theme  = 'basic'
+			output = '_site'
+
+			chmemo { |name|
+				dirname = 'data'
+				File.rename('content', dirname)
+
+				Dir.chdir('..')
+
+				path = File.join(name, dirname)
+				proc { memorack 'build', path }.must_output "Build '#{path}' -> '#{output}'\n"
+
+				Dir.chdir(output) { |output|
+					`find . -print`.must_equal @file_lists
+					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
+				}
+			}
+		end
+
+		it "build --output DIRECTORY" do
+			theme  = 'oreilly'
+			output = 'output'
+
+			chmemo { |name|
+				proc { memorack 'build', '--output', output }.must_output "Build 'content/' -> '#{output}'\n"
+
+				Dir.chdir(output) { |output|
+					`find . -print`.must_equal @file_lists
+					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
+				}
+			}
+		end
+
+		it "build --theme THEME" do
+			theme  = 'basic'
+			output = '_site'
+
+			chmemo { |name|
+				proc { memorack 'build', '--theme', theme }.must_output "Build 'content/' -> '#{output}'\n"
+
+				Dir.chdir(output) { |output|
+					`find . -print`.must_equal @file_lists
+					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
+				}
+			}
+		end
+
+		it "build --url URL" do
+			theme  = 'oreilly'
+			output = '_site'
+			url    = 'http://memo.pow'
+
+			chmemo { |name|
+				proc { memorack 'build', '--url', url }.must_output "Build 'content/' -> '#{output}'\n"
+
+				Dir.chdir(output) { |output|
+					`find . -print`.must_equal @file_lists
+					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
+					File.read('index.html').must_match %r[<a href="#{url}/README.html">README</a>]
+				}
+			}
+		end
+
+		it "build --local" do
+			theme  = 'oreilly'
+			output = '_site'
+
+			chmemo { |name|
+				url = 'file://' + File.expand_path(output)
+
+				proc { memorack 'build', '--local' }.must_output "Build 'content/' -> '#{output}'\n"
+
+				Dir.chdir(output) { |output|
+					`find . -print`.must_equal @file_lists
+					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
+					File.read('index.html').must_match %r[<a href="#{url}/README.html">README</a>]
+				}
+			}
+		end
+
+		it "build --prettify" do
+			theme  = 'oreilly'
+			output = '_site'
+			url    = ''
+
+			chmemo { |name|
+				proc { memorack 'build', '--prettify' }.must_output "Build 'content/' -> '#{output}'\n"
+
+				Dir.chdir(output) { |output|
+					`find . -print`.must_equal <<-EOD.cut_indent
+						.
+						./css
+						./css/2-column.css
+						./css/basic-styles.css
+						./css/styles.css
+						./index.html
+						./README
+						./README/index.html
+					EOD
+
+					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
+					File.read('index.html').must_match %r[<a href="#{url}/README">README</a>]
+				}
+			}
+		end
 	end
 
 	describe "server" do
-		it "server"
+		include Rack::Test::Methods
+
+		before do
+			@cwd = Dir.pwd
+
+			name = 'memo'
+			Dir.chdir(@tmpdir)
+			proc { memorack 'create', name }.must_output "Created '#{name}'\n"
+			Dir.chdir(name)
+		end
+
+		def app
+			Rack::Builder.parse_file('config.ru').first
+		end
+
+		it "server /" do
+			get '/'
+			last_response.must_be :ok?
+			last_response.body.must_match /Powered by <a href="#{MemoRack::HOMEPAGE}"[^>]*>/
+		end
+
+		it "server /README" do
+			get '/README'
+			last_response.must_be :ok?
+			last_response.body.must_match /このディレクトリに markdown 等のメモファイルを作成してください/
+		end
+
+		after do
+			Dir.chdir(@cwd)
+		end
 	end
 
 	after do
