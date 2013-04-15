@@ -120,6 +120,20 @@ Add code to `index.html`
 	<script src="/highlight.js/highlight.pack.js"></script>
 	<script>hljs.initHighlightingOnLoad();</script>
 
+### org-mode
+
+Install
+
+	$ gem install org-ruby
+
+Edit `config.json`
+
+	{
+		"formats":		["markdown", "org"],
+		"requires":		["org-ruby"],
+		...
+	}
+
 #### mustache variables
 
 Basic variables -- `{{VAR}}`
