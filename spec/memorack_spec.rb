@@ -340,9 +340,64 @@ describe MemoRack do
 			}
 		end
 
-		it "build --url URL"
-		it "build --local"
-		it "build --prettify"
+		it "build --url URL" do
+			theme  = 'oreilly'
+			output = '_site'
+			url    = 'http://memo.pow'
+
+			chmemo { |name|
+				proc { memorack 'build', '--url', url }.must_output "Build 'content/' -> '#{output}'\n"
+
+				Dir.chdir(output) { |output|
+					`find . -print`.must_equal @file_lists
+					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
+					File.read('index.html').must_match %r[<a href="#{url}/README.html">README</a>]
+				}
+			}
+		end
+
+		it "build --local" do
+			theme  = 'oreilly'
+			output = '_site'
+
+			chmemo { |name|
+				url = 'file://' + File.expand_path(output)
+
+				proc { memorack 'build', '--local' }.must_output "Build 'content/' -> '#{output}'\n"
+
+				Dir.chdir(output) { |output|
+					`find . -print`.must_equal @file_lists
+					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
+					File.read('index.html').must_match %r[<a href="#{url}/README.html">README</a>]
+				}
+			}
+		end
+
+		it "build --prettify" do
+			theme  = 'oreilly'
+			output = '_site'
+			url    = ''
+
+			chmemo { |name|
+				proc { memorack 'build', '--prettify' }.must_output "Build 'content/' -> '#{output}'\n"
+
+				Dir.chdir(output) { |output|
+					`find . -print`.must_equal <<-EOD.cut_indent
+						.
+						./css
+						./css/2-column.css
+						./css/basic-styles.css
+						./css/styles.css
+						./index.html
+						./README
+						./README/index.html
+					EOD
+
+					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
+					File.read('index.html').must_match %r[<a href="#{url}/README">README</a>]
+				}
+			}
+		end
 	end
 
 	describe "server" do
