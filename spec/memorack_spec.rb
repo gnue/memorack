@@ -258,6 +258,17 @@ describe MemoRack do
 				proc { memorack 'theme', '-c', File.join(theme, fname) }.must_output "Created '#{fname}'\n"
 			}
 		end
+
+	end
+
+	describe "build" do
+		it "build"
+		it "build PATH"
+		it "build --output DIRECTORY"
+		it "build --theme THEME"
+		it "build --url URL"
+		it "build --local"
+		it "build --prettify"
 	end
 
 	describe "server" do
