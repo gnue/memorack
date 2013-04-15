@@ -157,6 +157,7 @@ Special variables -- `{{{VAR}}}`
 * Add customizing tips
 * More test program
 * Plugin
+* Generate EPUB3
 
 ## Contributing
 
