@@ -11,8 +11,9 @@ Gem::Specification.new do |gem|
   gem.description   = %q{Rack Application for markdown memo}
   gem.summary       = %q{Rack Application for markdown memo}
   gem.homepage      = MemoRack::HOMEPAGE
+  gem.license       = "MIT"
 
-  gem.files         = `git ls-files`.split($/) + %w(VERSION)
+  gem.files         = `git ls-files`.split($/) + %w(REVISION)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
@@ -29,8 +30,11 @@ Gem::Specification.new do |gem|
   gem.add_dependency('i18n')
 
   # for development
+  gem.add_development_dependency('bundler', '~> 1.3')
+  gem.add_development_dependency('rake')
   gem.add_development_dependency('minitest')
   gem.add_development_dependency('turn')
+  gem.add_development_dependency('rack-test')
 
   gem.post_install_message = %Q{
     ==================
