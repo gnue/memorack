@@ -12,7 +12,7 @@ module MemoRack
 
 		DEFAULT_BUILD_OPTIONS = {
 			output:		'_site',
-			prefix:		'',
+			prefix:		'/',
 			suffix:		'.html',
 			uri_escape:	true,
 		}
@@ -21,7 +21,7 @@ module MemoRack
 			options = DEFAULT_BUILD_OPTIONS.merge(options)
 
 			url = @site[:url]
-			options[:prefix] = File.join(url, '') + options[:prefix] unless url.empty?
+			options[:prefix] = File.join(url, options[:prefix]) unless url.empty?
 
 			output = File.expand_path(options[:output])
 			dir_init(output)
