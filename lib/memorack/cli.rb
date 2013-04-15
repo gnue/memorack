@@ -310,7 +310,7 @@ module MemoRack
 				builder.generate(options)
 			end
 
-			puts "Build '#{path} -> #{options[:output]}'"
+			puts "Build '#{path}' -> '#{options[:output]}'"
 		end
 	end
 end
