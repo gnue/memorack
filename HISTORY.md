@@ -1,5 +1,9 @@
 ## History
 
+### v0.1.1 / 2013-04-16
+
+* fix error page css URL
+
 ### v0.1.0 / 2013-04-15
 
 * generate HTMLs for static site
