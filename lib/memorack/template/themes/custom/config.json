@@ -3,8 +3,10 @@
 	"theme":				"oreilly",		// テーマ（省略すると basic ）
 //	"markdown":				"kramdown",		// 使用する markdownライブラリ（省略すると redcarpet ）
 //	"formats":				["markdown"],	// "markdown", "rdoc", "textile" or "wiki" （要 Tilt に対応した gem ライブラリ）
-//	"public":				["styles.css"],	// build で出力されるファイル
 //	"requires":				[],				// require libraries
+
+//	"css":					["scss", "less"],	// css の自動変換を使用する
+//	"public":				["css/", "js/"],	// build で出力されるファイル
 
 	// redcarpet の拡張構文
 //	"tables":				false,			// テーブル
