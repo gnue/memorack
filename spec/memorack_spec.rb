@@ -428,6 +428,12 @@ describe MemoRack do
 			last_response.body.must_match /このディレクトリに markdown 等のメモファイルを作成してください/
 		end
 
+		it "server /404" do
+			get '/404'
+			last_response.status.must_equal 404
+			last_response.body.must_match %r[<div id="content"><h3>Not Found</h3>\s+</div>]
+		end
+
 		after do
 			Dir.chdir(@cwd)
 		end
