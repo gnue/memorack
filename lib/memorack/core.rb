@@ -41,7 +41,7 @@ module MemoRack
 		def initialize(options={})
 			options = DEFAULT_OPTIONS.merge(to_sym_keys(options))
 
-			@themes_folders = [options[:themes_folder], File.expand_path('../themes/', __FILE__)]
+			@themes_folders = [options[:themes_folder], folder(:themes)]
 			read_config(options[:theme], options)
 			read_config(DEFAULT_APP_OPTIONS[:theme], options) if @themes.empty?
 
@@ -59,6 +59,12 @@ module MemoRack
 			@locals = default_locals(@options)
 
 			use_engine(@markdown)
+		end
+
+		# フォルダ（ディレクトリ）を取得する
+		def folder(name)
+			@folders ||= {}
+			@folders[name] ||= File.expand_path(name.to_s, File.dirname(__FILE__))
 		end
 
 		# テーマのパスを取得する
