@@ -55,6 +55,9 @@ module MemoRack
 				@options.delete(key)
 			}
 
+			# プラグインの読込み
+			load_plugins
+
 			@requires.each { |lib| require lib }
 			@locals = default_locals(@options)
 
@@ -130,6 +133,34 @@ module MemoRack
 			# オプションをマージ
 			@options_chain.reverse.each { |opts| options.merge!(opts) }
 			options
+		end
+
+		# プラグイン・フォルダを取得する
+		def plugins_folders
+			unless @plugins_folders
+				@plugins_folders = ['plugins/', folder(:plugins)]
+				@themes.each { |theme|
+					path = File.join(theme, 'plugins/')
+					@plugins_folders.unshift path if File.directory?(path)
+				}
+			end
+
+			@plugins_folders
+		end
+
+		# プラグインを読込む
+		def load_plugins
+			plugins_folders.reverse.each { |folder|
+				Dir.glob(File.join(folder, '*')) { |path|
+					if File.directory?(path)
+						path = File.join(path, File.basename(path) + '.rb')
+						require_relative(path) if File.exists?(path)
+						next
+					end
+
+					require_relative(File.expand_path(path)) if path =~ /\.rb$/
+				}
+			}
 		end
 
 		# テンプレートエンジンを使用できるようにする
@@ -359,6 +390,17 @@ module MemoRack
 			mdmenu = MdMenu.new(options)
 			Dir.chdir(@root) { |path| mdmenu.collection('.') }
 			mdmenu
+		end
+
+		# パスからコンテント名を取得する
+		def content_name(path)
+			plugin = PageInfo[path]
+
+			if plugin
+				plugin.new(File.expand_path(path, @root))[:title]
+			else
+				File.basename(path, '.*')
+			end
 		end
 
 		# テンプレート名

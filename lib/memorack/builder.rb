@@ -170,7 +170,7 @@ module MemoRack
 
 		# メニューを作成
 		template :menu do
-			@contents.generate(StringIO.new).string
+			@contents.generate(StringIO.new, &method(:content_name).to_proc).string
 		end
 
 	end
