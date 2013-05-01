@@ -351,7 +351,7 @@ describe MemoRack do
 				Dir.chdir(output) { |output|
 					`find . -print`.must_equal @file_lists
 					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
-					File.read('index.html').must_match %r[<a href="#{url}/README.html">README</a>]
+					File.read('index.html').must_match %r[<a href="#{url}/README.html">MemoRack について</a>]
 				}
 			}
 		end
@@ -368,7 +368,7 @@ describe MemoRack do
 				Dir.chdir(output) { |output|
 					`find . -print`.must_equal @file_lists
 					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
-					File.read('index.html').must_match %r[<a href="#{url}/README.html">README</a>]
+					File.read('index.html').must_match %r[<a href="#{url}/README.html">MemoRack について</a>]
 				}
 			}
 		end
@@ -394,7 +394,7 @@ describe MemoRack do
 					EOD
 
 					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
-					File.read('index.html').must_match %r[<a href="#{url}/README">README</a>]
+					File.read('index.html').must_match %r[<a href="#{url}/README">MemoRack について</a>]
 				}
 			}
 		end
