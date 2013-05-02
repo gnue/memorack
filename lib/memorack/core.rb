@@ -4,8 +4,10 @@ require 'pathname'
 require 'rubygems'
 
 require 'memorack/tilt-mustache'
-require 'memorack/locals'
 require 'memorack/mdmenu'
+require 'memorack/locals'
+require 'memorack/locals/base'
+
 
 module MemoRack
 	class Core
@@ -84,20 +86,8 @@ module MemoRack
 
 		# デフォルトの locals を生成する
 		def default_locals(locals = {})
-			locals = Locals[locals]
-
-			locals[:site]			||= @site
-
-			locals[:app]			||= Locals[]
-			locals[:app][:name]		||= MemoRack::name
-			locals[:app][:version]	||= MemoRack::VERSION
-			locals[:app][:url]		||= MemoRack::HOMEPAGE
-
-			locals.define_key(:__menu__) { |hash, key|
-				@menu = nil unless @directory_watcher	# ファイル監視していない場合はメニューを初期化
-				@menu ||= render :markdown, :menu, @options
-			}
-
+			locals = BaseLocals.new(self, locals)
+			locals[:site] ||= @site
 			locals
 		end
 
@@ -298,6 +288,12 @@ module MemoRack
 			rescue => e
 				e.to_s
 			end
+		end
+
+		# メニューをレンダリングする
+		def render_menu
+			@menu = nil unless @directory_watcher	# ファイル監視していない場合はメニューを初期化
+			@menu ||= render :markdown, :menu, @options
 		end
 
 		# コンテンツをレンダリングする
