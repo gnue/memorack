@@ -264,8 +264,8 @@ describe MemoRack do
 	describe "build" do
 		before do
 			@hash = {}
-			@hash['basic']		= 'd414b3942f61e6b0a07f6458bfb133da40e7c7b8'
-			@hash['oreilly']	= '56b0c0f6a7394904442d7af6986797b1300301c3'
+			@hash['basic']		= '9b6d4163c422ff9304ebfec6beacb89e23715fe5'
+			@hash['oreilly']	= 'ef118f287e80648235a314980da908f70e982478'
 
 			@file_lists = <<-EOD.cut_indent
 				.
