@@ -13,7 +13,12 @@
 	border-radius: 10px;
 
 	ul {
-		padding-left: 20px;
+		padding-left: 0;
+		margin: 14px 0 14px 20px;
+	}
+
+	ul ul {
+		margin: 0 0 0 20px;
 	}
 
 	a:link {
