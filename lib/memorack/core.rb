@@ -301,11 +301,11 @@ module MemoRack
 		end
 
 		# コンテンツをレンダリングする
-		def render_content(path_info, locals = {})
+		def render_content(path_info, locals = {}, exts = enable_exts)
 			path, ext = split_extname(path_info)
 
 			if @suffix == ''
-				fullpath = file_search(path_info, @options)
+				fullpath = file_search(path_info, @options, exts)
 
 				if fullpath
 					path = path_info

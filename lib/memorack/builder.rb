@@ -45,7 +45,7 @@ module MemoRack
 				callback.call(path) if callback
 
 				content_write(path, suffix, output) { |template|
-					render_content(template)
+					render_content(template, {}, nil)
 				}
 			}
 
