@@ -8,9 +8,11 @@ module MemoRack
 	class PageInfo < Locals
 		extend Plugin
 
-		def initialize(path, options={})
+		def initialize(path, hash = nil, ifnone = nil)
+			super ifnone
+
 			@path = path
-			@options = options
+			merge!(hash) if hash
 		end
 
 		def values
