@@ -270,8 +270,16 @@ module MemoRack
 				locals[:content] = true unless template == :index
 				locals[:page] = page = Locals[locals[:page] || {}]
 
+				if template.kind_of?(Pathname)
+					path = template.to_s
+					plugin = PageInfo[path]
+					locals[:page] = page = plugin.new(path, page) if plugin
+				end
+
 				page.define_key(:name) { |hash, key|
-					unless template == :index
+					if hash.kind_of?(PageInfo)
+						hash.value(:title)
+					elsif template != :index
 						fname = locals[:path_info]
 						fname ||= template.to_s.force_encoding('UTF-8')
 						File.basename(fname)
