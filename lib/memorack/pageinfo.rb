@@ -58,14 +58,9 @@ module MemoRack
 
 		define_keys :title
 
-		# 作成日
-		define_key(:ctime) { |key|
-			values[key] ||= File::Stat.new(@path).ctime
-		}
-
-		# 更新日
-		define_key(:mtime) { |key|
-			values[key] ||= File::Stat.new(@path).mtime
+		# 作成日・更新日
+		define_keys(:ctime, :mtime) { |key|
+			values[key] ||= File::Stat.new(@path).send(key)
 		}
 	end
 
