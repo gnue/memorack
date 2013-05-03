@@ -252,12 +252,16 @@ module MemoRack
 				locals.define_key(:__content__) { |hash, key|
 					if engine
 						render engine, template, options
+					elsif locals[:directory?]
+						# ディレクトリ
+						nil
 					else
 						template
 					end
 				}
 
-				locals[:content] = true unless template == :index
+				locals[:directory?] = true if template.kind_of?(Pathname) && template.directory?
+				locals[:content?] = true unless template == :index || locals[:directory?]
 				locals[:page] = page = Locals[locals[:page] || {}]
 
 				if template.kind_of?(Pathname)
@@ -298,6 +302,12 @@ module MemoRack
 
 		# コンテンツをレンダリングする
 		def render_content(path_info, locals = {}, exts = enable_exts)
+			path = File.join(@root, path_info)
+
+			if File.directory?(path)
+				return render_with_mustache Pathname.new(path), nil, {}, locals
+			end
+
 			path, ext = split_extname(path_info)
 
 			if @suffix == ''
