@@ -67,7 +67,7 @@ module MemoRack
 
 			@themes_folders.each { |folder|
 				path = theme && File.join(folder, theme)
-				return path if File.exists?(path) && FileTest::directory?(path)
+				return path if File.exists?(path) && File.directory?(path)
 			}
 
 			nil
