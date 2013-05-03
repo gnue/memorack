@@ -17,14 +17,17 @@ module MemoRack
 			uri_escape:	true,
 		}
 
+		DEFAULT_KEEPS = ['.git', '.hg', '.svn', '.csv']
+
 		def generate(options = {}, &callback)
 			options = DEFAULT_BUILD_OPTIONS.merge(options)
+			keeps = options[:keep] || @options[:keeps] || DEFAULT_KEEPS
 
 			url = @site[:url]
 			options[:prefix] = File.join(url, options[:prefix]) unless url.empty?
 
 			output = File.expand_path(options[:output])
-			dir_init(output)
+			dir_init(output, keeps)
 
 			@contents = contents(options)
 			@templates = Set.new @contents.files.collect { |file| file[:path] }
@@ -54,10 +57,13 @@ module MemoRack
 		end
 
 		# ディレクトリを初期化する
-		def dir_init(dir)
+		def dir_init(dir, keeps = [])
 			if Dir.exists?(dir)
 				Dir.glob(File.join(dir, '*'), File::FNM_DOTMATCH) { |path|
-					next if /(^|\/)(\.|\.\.)$/ =~ path
+					fname = File.basename(path)
+
+					next if /^\.{1,2}$/ =~ fname
+					next if keeps.member?(fname)
 
 					FileUtils.remove_entry_secure(path)
 				}
