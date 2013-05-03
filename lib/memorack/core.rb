@@ -28,7 +28,7 @@ module MemoRack
 
 		# テンプレートエンジンのオプション
 		DEFAULT_TEMPLATE_OPTIONS = {
-			tables:			true
+			tables:				true
 		}
 
 		# テンプレートで使用するローカル変数の初期値
