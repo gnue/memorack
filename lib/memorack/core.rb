@@ -130,20 +130,8 @@ module MemoRack
 					break unless dir
 					break if @themes.member?(dir)
 
-					# テーマ・チェインに追加
-					@themes << File.join(dir, '')
-
-					# config の読込み
-					config = read_data(File.join(dir, 'config'))
-
-					if config
-						@options_chain << config
-						theme = config[:theme]
-					end
-
-					# macro の読込み
-					macro = read_data(File.join(dir, 'macro'))
-					@macro_chain << macro if macro && macro.kind_of?(Hash)
+					# 設定ファイルのデータをチェインに追加
+					theme = add_config_chain(dir, theme)
 				end
 			rescue
 			end
@@ -154,6 +142,26 @@ module MemoRack
 			# オプションをマージ
 			@options_chain.reverse.each { |opts| options.merge!(opts) }
 			options
+		end
+
+		# 設定ファイルのデータをチェインに追加
+		def add_config_chain(dir, theme = nil)
+			# テーマ・チェインに追加
+			@themes << File.join(dir, '')
+
+			# config の読込み
+			config = read_data(File.join(dir, 'config'))
+
+			if config
+				@options_chain << config
+				theme = config[:theme]
+			end
+
+			# macro の読込み
+			macro = read_data(File.join(dir, 'macro'))
+			@macro_chain << macro if macro && macro.kind_of?(Hash)
+
+			theme
 		end
 
 		# プラグイン・フォルダを取得する
