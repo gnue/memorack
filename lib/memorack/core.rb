@@ -340,10 +340,7 @@ module MemoRack
 				case value
 				when Hash
 					if hash[key].kind_of?(Array)
-						hash[key].each_with_index { |item, index|
-							hash[key][index] = value_to_locals(item)
-							embed_macro(hash[key][index], value, options)
-						}
+						embed_macro_for_array(hash[key], value, options, locals)
 					else
 						hash[key] = value_to_locals(hash[key])
 						embed_macro(hash[key], value, options, locals)
@@ -369,6 +366,18 @@ module MemoRack
 							engine.render({}, locals).force_encoding('UTF-8')
 						end
 					}
+				end
+			}
+		end
+
+		# マクロを配列に組込む
+		def embed_macro_for_array(array, macro, options = {}, locals)
+			array.each_with_index { |item, index|
+				if item.kind_of?(Array)
+					embed_macro_for_array(item, macro, options, locals)
+				else
+					array[index] = value_to_locals(item)
+					embed_macro(array[index], macro, options)
 				end
 			}
 		end
