@@ -349,14 +349,16 @@ module MemoRack
 					hash[key] = [] unless hash[key]
 					a = hash[key]
 
-					value.each_with_index { |item, index|
-						if item.kind_of?(Hash)
-							a[index] = value_to_locals(a[index])
-							embed_macro(a[index], item, options, locals)
-						else
-							a[index] = item
-						end
-					}
+					if a.kind_of?(Array)
+						value.each_with_index { |item, index|
+							if item.kind_of?(Hash)
+								a[index] = value_to_locals(a[index])
+								embed_macro(a[index], item, options, locals)
+							else
+								a[index] = item
+							end
+						}
+					end
 				else
 					hash.define_key(key) { |hash, key|
 						if value
