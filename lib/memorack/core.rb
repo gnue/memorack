@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 
+require 'yaml'
 require 'pathname'
 require 'rubygems'
 
@@ -91,6 +92,31 @@ module MemoRack
 			locals
 		end
 
+		# json/yaml のデータを読込む
+		def read_data(name, exts = ['json', 'yml', 'yaml'])
+			exts.each { |ext|
+				path = [name, ext].join('.')
+				if File.readable?(path)
+					begin
+						data = File.read(path)
+
+						case ext
+						when 'json'
+							hash = JSON.parse(data)
+						when 'yml', 'yaml'
+							hash = YAML.load(data)
+						end
+
+						data = to_sym_keys(hash) if hash
+						return data
+					rescue
+					end
+				end
+			}
+
+			nil
+		end
+
 		# 設定ファイルを読込む
 		def read_config(theme, options = {})
 			@themes ||= []
@@ -109,13 +135,12 @@ module MemoRack
 					@themes << File.join(dir, '')
 
 					# config の読込み
-					path = File.join(dir, 'config.json')
-					break unless File.readable?(path)
+					config = read_data(File.join(dir, 'config'))
 
-					data = File.read(path)
-					@options_chain << to_sym_keys(JSON.parse(data))
-
-					theme = @options_chain.last[:theme]
+					if config
+						@options_chain << config
+						theme = config[:theme]
+					end
 				end
 			rescue
 			end
