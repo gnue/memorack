@@ -136,6 +136,9 @@ module MemoRack
 			rescue
 			end
 
+			# デフォルトの設定をチェインに追加
+			add_config_chain(File.expand_path('../config', __FILE__))
+
 			# マクロをマージ
 			@macro_chain.reverse.each { |macro| @macro.merge!(macro) }
 
@@ -147,7 +150,7 @@ module MemoRack
 		# 設定ファイルのデータをチェインに追加
 		def add_config_chain(dir, theme = nil)
 			# テーマ・チェインに追加
-			@themes << File.join(dir, '')
+			@themes << File.join(dir, '') if theme
 
 			# config の読込み
 			config = read_data(File.join(dir, 'config'))

@@ -246,7 +246,6 @@ describe MemoRack do
 					./css/styles.scss
 					./error.html
 					./index.html
-					./macro.yml
 				EOD
 			}
 		end
