@@ -97,20 +97,17 @@ module MemoRack
 			exts.each { |ext|
 				path = [name, ext].join('.')
 				if File.readable?(path)
-					begin
-						data = File.read(path)
+					data = File.read(path)
 
-						case ext
-						when 'json'
-							hash = JSON.parse(data)
-						when 'yml', 'yaml'
-							hash = YAML.load(data)
-						end
-
-						data = to_sym_keys(hash) if hash
-						return data
-					rescue
+					case ext
+					when 'json'
+						hash = JSON.parse(data)
+					when 'yml', 'yaml'
+						hash = YAML.load(data)
 					end
+
+					data = to_sym_keys(hash) if hash
+					return data
 				end
 			}
 
@@ -122,6 +119,8 @@ module MemoRack
 			@themes ||= []
 			@options_chain = []
 			@theme_chain = []
+			@macro_chain = []
+			@macro = {}
 
 			begin
 				require 'json'
@@ -141,9 +140,16 @@ module MemoRack
 						@options_chain << config
 						theme = config[:theme]
 					end
+
+					# macro の読込み
+					macro = read_data(File.join(dir, 'macro'))
+					@macro_chain << macro if macro && macro.kind_of?(Hash)
 				end
 			rescue
 			end
+
+			# マクロをマージ
+			@macro_chain.reverse.each { |macro| @macro.merge!(macro) }
 
 			# オプションをマージ
 			@options_chain.reverse.each { |opts| options.merge!(opts) }
@@ -305,18 +311,66 @@ module MemoRack
 					end
 				}
 
-				page.define_key(:title) { |hash, key|
-					page_title = home_title = locals[:title]
-					page_name = hash[:name]
-					page_title = "#{page_name} | #{home_title}" if page_name
+				# マクロを組込む
+				embed_macro(locals, @macro)
 
-					page_title
-				}
-
+				# HTMLページをレンダリングする
 				render :mustache, mustache_templ, {views: @themes}, locals
 			rescue => e
 				e.to_s
 			end
+		end
+
+		# Localsクラス 変換する
+		def value_to_locals(value)
+			case value
+			when Locals
+			when Hash
+				value = Locals[value]
+			else
+				value = Locals[]
+			end
+
+			value
+		end
+
+		# マクロを組込む
+		def embed_macro(hash, macro, options = {}, locals = hash)
+			macro.each { |key, value|
+				case value
+				when Hash
+					if hash[key].kind_of?(Array)
+						hash[key].each_with_index { |item, index|
+							hash[key][index] = value_to_locals(item)
+							embed_macro(hash[key][index], value, options)
+						}
+					else
+						hash[key] = value_to_locals(hash[key])
+						embed_macro(hash[key], value, options, locals)
+					end
+				when Array
+					hash[key] = [] unless hash[key]
+					a = hash[key]
+
+					value.each_with_index { |item, index|
+						if item.kind_of?(Hash)
+							a[index] = value_to_locals(a[index])
+							embed_macro(a[index], item, options, locals)
+						else
+							a[index] = item
+						end
+					}
+				else
+					hash.define_key(key) { |hash, key|
+						if value
+							#render :mustache, value, {}, locals
+
+							engine = Tilt.new('.mustache', {}) { value }
+							engine.render({}, locals).force_encoding('UTF-8')
+						end
+					}
+				end
+			}
 		end
 
 		# メニューをレンダリングする
