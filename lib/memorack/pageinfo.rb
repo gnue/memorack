@@ -8,11 +8,15 @@ module MemoRack
 	class PageInfo < Locals
 		extend Plugin
 
+		attr_accessor :max_lines
+
 		def initialize(path, hash = nil, ifnone = nil)
 			super ifnone
 
 			@path = path
 			merge!(hash) if hash
+
+			@max_lines = 5
 		end
 
 		def values
@@ -30,10 +34,11 @@ module MemoRack
 
 			open(@path, 'r') { |file|
 				prev = nil
+				n = 1
 
-				(1 .. 5).each { |i|
-					break if methods.empty?
+				until methods.empty?
 				 	break unless line = file.gets
+					break if parse_end?(line, n)
 
 					methods.each { |key, m|
 						v = send(m, line, prev)
@@ -44,10 +49,16 @@ module MemoRack
 					}
 
 					prev = line
-				}
+					n += 1
+				end
 			}
 
 			values[info_list.first]
+		end
+
+		# ファイル解析の終了か？
+		def parse_end?(line, n)
+			max_lines < n
 		end
 
 		def self.define_keys(*keys, &block)

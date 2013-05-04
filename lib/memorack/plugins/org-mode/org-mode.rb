@@ -21,6 +21,11 @@ module MemoRack
 			}
 		end
 
+		# ファイル解析の終了か？
+		def parse_end?(line, n)
+			line !~ /^\#/
+		end
+
 		def org_info(name, line)
 			name = name.to_s.upcase
 
