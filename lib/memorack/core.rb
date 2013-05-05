@@ -211,6 +211,29 @@ module MemoRack
 			@css_exts ||= Set.new ['css', *@css]
 		end
 
+		# テーマから固定ページのファイルを収集する
+		def pages
+			unless @pages
+				@pages = {}
+
+				@themes.each { |theme|
+					folder = File.join(theme, 'pages/')
+
+					if Dir.exists?(folder)
+						Dir.chdir(folder) { |dir|
+							Dir.glob(File.join('**/*')) { |path|
+								path_info, ext = split_extname(path)
+								path_info = File.join('', path_info)
+								@pages[path_info] ||= File.expand_path(path)
+							}
+						}
+					end
+				}
+			end
+
+			@pages
+		end
+
 		# ファイルを探す
 		def file_search(template, options = {}, exts = enable_exts)
 			options = {views: @root}.merge(options)
