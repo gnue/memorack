@@ -45,7 +45,7 @@ module MemoRack
 				callback.call(path) if callback
 
 				content_write(path, suffix, output) { |template|
-					render_content(template)
+					render_content template, {path_info: path}, nil
 				}
 			}
 
@@ -170,7 +170,7 @@ module MemoRack
 
 		# メニューを作成
 		template :menu do
-			@contents.generate(StringIO.new).string
+			@contents.generate(StringIO.new, &method(:content_name).to_proc).string
 		end
 
 	end

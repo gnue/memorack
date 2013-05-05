@@ -122,11 +122,12 @@ class MdMenu
 	end
 
 	# 新規リンクを追加する
-	def generate(outfile = @file)
+	def generate(outfile = @file, &block)
 		len = @files.length
 
 		if 0 < len
 			outfile = nil if outfile && outfile.kind_of?(String) && File.exist?(outfile) && ! @config[:update]
+			block = lambda { |path| File.basename(path, '.*') } unless block
 
 			stdout(outfile, 'a') {
 				prefix = @config[:prefix]
@@ -134,7 +135,7 @@ class MdMenu
 				dirs = []
 
 				@files.each { |item|
-					title = File.basename(item[:path], '.*')
+					title = block.call(item[:path])
 					link = item[:link]
 
 					dir, dirs = each_subdir(File.dirname(link), dir, dirs) { |name, i|

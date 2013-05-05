@@ -4,8 +4,10 @@ require 'pathname'
 require 'rubygems'
 
 require 'memorack/tilt-mustache'
-require 'memorack/locals'
 require 'memorack/mdmenu'
+require 'memorack/locals'
+require 'memorack/locals/base'
+
 
 module MemoRack
 	class Core
@@ -41,7 +43,7 @@ module MemoRack
 		def initialize(options={})
 			options = DEFAULT_OPTIONS.merge(to_sym_keys(options))
 
-			@themes_folders = [options[:themes_folder], File.expand_path('../themes/', __FILE__)]
+			@themes_folders = [options[:themes_folder], folder(:themes)]
 			read_config(options[:theme], options)
 			read_config(DEFAULT_APP_OPTIONS[:theme], options) if @themes.empty?
 
@@ -55,10 +57,19 @@ module MemoRack
 				@options.delete(key)
 			}
 
+			# プラグインの読込み
+			load_plugins
+
 			@requires.each { |lib| require lib }
 			@locals = default_locals(@options)
 
 			use_engine(@markdown)
+		end
+
+		# フォルダ（ディレクトリ）を取得する
+		def folder(name)
+			@folders ||= {}
+			@folders[name] ||= File.expand_path(name.to_s, File.dirname(__FILE__))
 		end
 
 		# テーマのパスを取得する
@@ -75,20 +86,8 @@ module MemoRack
 
 		# デフォルトの locals を生成する
 		def default_locals(locals = {})
-			locals = Locals[locals]
-
-			locals[:site]			||= @site
-
-			locals[:app]			||= Locals[]
-			locals[:app][:name]		||= MemoRack::name
-			locals[:app][:version]	||= MemoRack::VERSION
-			locals[:app][:url]		||= MemoRack::HOMEPAGE
-
-			locals.define_key(:__menu__) { |hash, key|
-				@menu = nil unless @directory_watcher	# ファイル監視していない場合はメニューを初期化
-				@menu ||= render :markdown, :menu, @options
-			}
-
+			locals = BaseLocals.new(self, locals)
+			locals[:site] ||= @site
 			locals
 		end
 
@@ -124,6 +123,34 @@ module MemoRack
 			# オプションをマージ
 			@options_chain.reverse.each { |opts| options.merge!(opts) }
 			options
+		end
+
+		# プラグイン・フォルダを取得する
+		def plugins_folders
+			unless @plugins_folders
+				@plugins_folders = ['plugins/', folder(:plugins)]
+				@themes.each { |theme|
+					path = File.join(theme, 'plugins/')
+					@plugins_folders.unshift path if File.directory?(path)
+				}
+			end
+
+			@plugins_folders
+		end
+
+		# プラグインを読込む
+		def load_plugins
+			plugins_folders.reverse.each { |folder|
+				Dir.glob(File.join(folder, '*')) { |path|
+					if File.directory?(path)
+						path = File.join(path, File.basename(path) + '.rb')
+						require_relative(path) if File.exists?(path)
+						next
+					end
+
+					require_relative(File.expand_path(path)) if path =~ /\.rb$/
+				}
+			}
 		end
 
 		# テンプレートエンジンを使用できるようにする
@@ -225,16 +252,28 @@ module MemoRack
 				locals.define_key(:__content__) { |hash, key|
 					if engine
 						render engine, template, options
+					elsif locals[:directory?]
+						# ディレクトリ
+						nil
 					else
 						template
 					end
 				}
 
-				locals[:content] = true unless template == :index
+				locals[:directory?] = true if template.kind_of?(Pathname) && template.directory?
+				locals[:content?] = true unless template == :index || locals[:directory?]
 				locals[:page] = page = Locals[locals[:page] || {}]
 
+				if template.kind_of?(Pathname)
+					path = template.to_s
+					plugin = PageInfo[path]
+					locals[:page] = page = plugin.new(path, page) if plugin
+				end
+
 				page.define_key(:name) { |hash, key|
-					unless template == :index
+					if hash.kind_of?(PageInfo)
+						hash.value(:title)
+					elsif template != :index
 						fname = locals[:path_info]
 						fname ||= template.to_s.force_encoding('UTF-8')
 						File.basename(fname)
@@ -255,12 +294,24 @@ module MemoRack
 			end
 		end
 
+		# メニューをレンダリングする
+		def render_menu
+			@menu = nil unless @directory_watcher	# ファイル監視していない場合はメニューを初期化
+			@menu ||= render :markdown, :menu, @options
+		end
+
 		# コンテンツをレンダリングする
-		def render_content(path_info, locals = {})
+		def render_content(path_info, locals = {}, exts = enable_exts)
+			path = File.join(@root, path_info)
+
+			if File.directory?(path)
+				return render_with_mustache Pathname.new(path), nil, {}, locals
+			end
+
 			path, ext = split_extname(path_info)
 
 			if @suffix == ''
-				fullpath = file_search(path_info, @options)
+				fullpath = file_search(path_info, @options, exts)
 
 				if fullpath
 					path = path_info
@@ -353,6 +404,17 @@ module MemoRack
 			mdmenu = MdMenu.new(options)
 			Dir.chdir(@root) { |path| mdmenu.collection('.') }
 			mdmenu
+		end
+
+		# パスからコンテント名を取得する
+		def content_name(path)
+			plugin = PageInfo[path]
+
+			if plugin
+				plugin.new(File.expand_path(path, @root))[:title]
+			else
+				File.basename(path, '.*')
+			end
 		end
 
 		# テンプレート名
