@@ -40,6 +40,15 @@ module MemoRack
 			suffix = options[:suffix]
 			suffix = '/index.html' if ['', '/'].member?(suffix)
 
+			# 固定ページのレンダリングを行う
+			pages.each { |path_info, path|
+				callback.call(path_info) if callback
+
+				content_write(path_info, suffix, output) { |template|
+					render_page template, {path_info: path_info}
+				}
+			}
+
 			# コンテンツのレンダリングを行う
 			@templates.each { |path|
 				callback.call(path) if callback
