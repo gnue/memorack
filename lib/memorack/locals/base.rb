@@ -42,16 +42,16 @@ module MemoRack
 			@subdirs
 		end
 
-		define_key :nav do |key|
-			unless @nav
-				@nav = []
-				@nav << {name: self[:title], href: File.join(self[:site][:url].to_s, '')}
-				@nav += self[:subdirs] if self[:subdirs]
-				@nav << {name: self[:page][:name]} if self[:page][:name]
-				@nav.last[:last?] = true
+		define_key :topicpath do |key|
+			unless @topicpath
+				@topicpath = []
+				@topicpath << {name: self[:title], href: File.join(self[:site][:url].to_s, '')}
+				@topicpath += self[:subdirs] if self[:subdirs]
+				@topicpath << {name: self[:page][:name]} if self[:page][:name]
+				@topicpath.last[:last?] = true
 			end
 
-			@nav
+			@topicpath
 		end
 
 	end
