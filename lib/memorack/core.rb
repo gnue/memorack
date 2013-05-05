@@ -233,13 +233,16 @@ module MemoRack
 				return nil
 			end
 
+			dir = options[:views]
+			dir = File.join(dir, options[:folder]) if options[:folder]
+
 			if exts
 				exts.each { |ext|
-					path = File.join(options[:views], "#{template}.#{ext}")
+					path = File.join(dir, "#{template}.#{ext}")
 					return path if File.exists?(path)
 				}
 			else
-				path = File.join(options[:views], template)
+				path = File.join(dir, template)
 				return path if File.exists?(path)
 			end
 
