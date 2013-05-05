@@ -356,6 +356,17 @@ module MemoRack
 				embed_macro(locals, @macro)
 
 				# HTMLページをレンダリングする
+				if engine && engine.to_sym == :html
+					unless template.kind_of?(Pathname)
+						path = file_search(template, @options, [engine])
+						return nil unless path
+						template = Pathname.new(path)
+					end
+
+					locals.define_key(:__content__) { |hash, key| }
+					return render :mustache, template, {views: @themes}, locals
+				end
+
 				mustache_templ << 'page.html' if locals[:content?]
 				mustache_templ << 'index.html'
 
@@ -440,6 +451,16 @@ module MemoRack
 		def render_menu
 			@menu = nil unless @directory_watcher	# ファイル監視していない場合はメニューを初期化
 			@menu ||= render :markdown, :menu, @options
+		end
+
+		# 固定ページをレンダリングする
+		def render_page(path_info, locals = {})
+			path_info = path_info.gsub(%r[(/|.html)$], '')
+			path = pages[path_info]
+			return nil unless path
+
+			ext = split_extname(path)[1]
+			content = render_with_mustache Pathname.new(path), ext, {}, locals
 		end
 
 		# コンテンツをレンダリングする

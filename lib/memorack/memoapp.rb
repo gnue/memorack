@@ -41,7 +41,8 @@ module MemoRack
 				end
 			else
 				locals = {env: env, path_info: path_info}
-				content = render_content(path_info, locals)
+				content ||= render_content(path_info, locals)
+				content ||= render_page(path_info, locals)
 			end
 
 			return [200, {'Content-Type' => content_type}, [content.to_s]] if content
