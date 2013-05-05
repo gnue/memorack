@@ -94,22 +94,25 @@ module MemoRack
 
 		# json/yaml のデータを読込む
 		def read_data(name, exts = ['json', 'yml', 'yaml'])
-			exts.each { |ext|
-				path = [name, ext].join('.')
-				if File.readable?(path)
-					data = File.read(path)
+			begin
+				exts.each { |ext|
+					path = [name, ext].join('.')
+					if File.readable?(path)
+						data = File.read(path)
 
-					case ext
-					when 'json'
-						hash = JSON.parse(data)
-					when 'yml', 'yaml'
-						hash = YAML.load(data)
+						case ext
+						when 'json'
+							hash = JSON.parse(data)
+						when 'yml', 'yaml'
+							hash = YAML.load(data)
+						end
+
+						data = to_sym_keys(hash) if hash
+						return data
 					end
-
-					data = to_sym_keys(hash) if hash
-					return data
-				end
-			}
+				}
+			rescue
+			end
 
 			nil
 		end
