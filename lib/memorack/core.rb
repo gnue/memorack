@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 
+require 'yaml'
 require 'pathname'
 require 'rubygems'
 
@@ -91,11 +92,38 @@ module MemoRack
 			locals
 		end
 
+		# json/yaml のデータを読込む
+		def read_data(name, exts = ['json', 'yml', 'yaml'])
+			begin
+				exts.each { |ext|
+					path = [name, ext].join('.')
+					if File.readable?(path)
+						data = File.read(path)
+
+						case ext
+						when 'json'
+							hash = JSON.parse(data)
+						when 'yml', 'yaml'
+							hash = YAML.load(data)
+						end
+
+						data = to_sym_keys(hash) if hash
+						return data
+					end
+				}
+			rescue
+			end
+
+			nil
+		end
+
 		# 設定ファイルを読込む
 		def read_config(theme, options = {})
 			@themes ||= []
 			@options_chain = []
 			@theme_chain = []
+			@macro_chain = []
+			@macro = {}
 
 			begin
 				require 'json'
@@ -105,24 +133,41 @@ module MemoRack
 					break unless dir
 					break if @themes.member?(dir)
 
-					# テーマ・チェインに追加
-					@themes << File.join(dir, '')
-
-					# config の読込み
-					path = File.join(dir, 'config.json')
-					break unless File.readable?(path)
-
-					data = File.read(path)
-					@options_chain << to_sym_keys(JSON.parse(data))
-
-					theme = @options_chain.last[:theme]
+					# 設定ファイルのデータをチェインに追加
+					theme = add_config_chain(dir, theme)
 				end
 			rescue
 			end
 
+			# デフォルトの設定をチェインに追加
+			add_config_chain(File.expand_path('../config', __FILE__))
+
+			# マクロをマージ
+			@macro_chain.reverse.each { |macro| @macro.merge!(macro) }
+
 			# オプションをマージ
 			@options_chain.reverse.each { |opts| options.merge!(opts) }
 			options
+		end
+
+		# 設定ファイルのデータをチェインに追加
+		def add_config_chain(dir, theme = nil)
+			# テーマ・チェインに追加
+			@themes << File.join(dir, '') if theme
+
+			# config の読込み
+			config = read_data(File.join(dir, 'config'))
+
+			if config
+				@options_chain << config
+				theme = config[:theme]
+			end
+
+			# macro の読込み
+			macro = read_data(File.join(dir, 'macro'))
+			@macro_chain << macro if macro && macro.kind_of?(Hash)
+
+			theme
 		end
 
 		# プラグイン・フォルダを取得する
@@ -280,18 +325,77 @@ module MemoRack
 					end
 				}
 
-				page.define_key(:title) { |hash, key|
-					page_title = home_title = locals[:title]
-					page_name = hash[:name]
-					page_title = "#{page_name} | #{home_title}" if page_name
+				# マクロを組込む
+				embed_macro(locals, @macro)
 
-					page_title
-				}
-
+				# HTMLページをレンダリングする
 				render :mustache, mustache_templ, {views: @themes}, locals
 			rescue => e
 				e.to_s
 			end
+		end
+
+		# Localsクラス 変換する
+		def value_to_locals(value)
+			case value
+			when Locals
+			when Hash
+				value = Locals[value]
+			else
+				value = Locals[]
+			end
+
+			value
+		end
+
+		# マクロを組込む
+		def embed_macro(hash, macro, options = {}, locals = hash)
+			macro.each { |key, value|
+				case value
+				when Hash
+					if hash[key].kind_of?(Array)
+						embed_macro_for_array(hash[key], value, options, locals)
+					else
+						hash[key] = value_to_locals(hash[key])
+						embed_macro(hash[key], value, options, locals)
+					end
+				when Array
+					hash[key] = [] unless hash[key]
+					a = hash[key]
+
+					if a.kind_of?(Array)
+						value.each_with_index { |item, index|
+							if item.kind_of?(Hash)
+								a[index] = value_to_locals(a[index])
+								embed_macro(a[index], item, options, locals)
+							else
+								a[index] = item
+							end
+						}
+					end
+				else
+					hash.define_key(key) { |hash, key|
+						if value
+							#render :mustache, value, {}, locals
+
+							engine = Tilt.new('.mustache', {}) { value }
+							engine.render({}, locals).force_encoding('UTF-8')
+						end
+					}
+				end
+			}
+		end
+
+		# マクロを配列に組込む
+		def embed_macro_for_array(array, macro, options = {}, locals)
+			array.each_with_index { |item, index|
+				if item.kind_of?(Array)
+					embed_macro_for_array(item, macro, options, locals)
+				else
+					array[index] = value_to_locals(item)
+					embed_macro(array[index], macro, options)
+				end
+			}
 		end
 
 		# メニューをレンダリングする
