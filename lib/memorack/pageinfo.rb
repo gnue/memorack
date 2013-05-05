@@ -10,13 +10,14 @@ module MemoRack
 
 		attr_accessor :max_lines
 
-		def initialize(path, hash = nil, ifnone = nil)
+		def initialize(path, hash = nil, parent = {}, ifnone = nil)
 			super ifnone
 
 			@path = path
 			merge!(hash) if hash
 
 			@max_lines = 5
+			@parent = parent
 		end
 
 		def values
@@ -65,6 +66,7 @@ module MemoRack
 		def log
 			unless @log
 				@log = []
+				return @log unless @parent[:git]
 
 				begin
 					dir, fname = File.split(@path)

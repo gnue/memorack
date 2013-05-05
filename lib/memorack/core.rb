@@ -312,7 +312,7 @@ module MemoRack
 				if template.kind_of?(Pathname)
 					path = template.to_s
 					plugin = PageInfo[path]
-					locals[:page] = page = plugin.new(path, page) if plugin
+					locals[:page] = page = plugin.new(path, page, locals) if plugin
 				end
 
 				page.define_key(:name) { |hash, key|
