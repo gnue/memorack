@@ -10,13 +10,14 @@ module MemoRack
 
 		attr_accessor :max_lines
 
-		def initialize(path, hash = nil, ifnone = nil)
+		def initialize(path, hash = nil, parent = {}, ifnone = nil)
 			super ifnone
 
 			@path = path
 			merge!(hash) if hash
 
 			@max_lines = 5
+			@parent = parent
 		end
 
 		def values
@@ -61,6 +62,34 @@ module MemoRack
 			max_lines < n
 		end
 
+		# git log で更新日時一覧を取得する
+		def log
+			unless @log
+				@log = []
+				return @log unless @parent[:git]
+
+				begin
+					dir, fname = File.split(@path)
+					Dir.chdir(dir) { |dir|
+						log << File::Stat.new(fname).mtime if `git status` =~ /modified:\s+#{fname}/
+
+						`git log --pretty='%ad' --date iso '#{fname}'`.each_line { |line|
+							@log << line
+						}
+					}
+				rescue
+				end
+			end
+
+			@log
+		end
+
+		# 値を Timeクラスに変換する
+		def value_to_time(value)
+			value = Time.parse(value) if value.kind_of?(String)
+			value
+		end
+
 		def self.define_keys(*keys, &block)
 			block = lambda { |key| values[key] || parse(key) } unless block
 
@@ -73,7 +102,9 @@ module MemoRack
 
 		# 作成時間・更新時間
 		define_keys(:ctime, :mtime) { |key|
-			values[key] ||= File::Stat.new(@path).send(key)
+			values[key] ||= key == :ctime && value_to_time(log.last)	# log から作成時間を取得
+			values[key] ||= key == :mtime && value_to_time(log.first)	# log から更新時間を取得
+			values[key] ||= File::Stat.new(@path).send(key)				# なければファイル情報から取得
 		}
 
 		# 作成日・更新日
