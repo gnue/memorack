@@ -289,7 +289,8 @@ module MemoRack
 		# レイアウトに mustache を適用してテンプレートエンジンでレンダリングする
 		def render_with_mustache(template, engine = :markdown, options = {}, locals = {})
 			begin
-				mustache_templ = options[:mustache] || 'index.html'
+				mustache_templ = []
+				mustache_templ << options[:mustache] if options[:mustache]
 
 				options = @options.merge(options)
 				locals = @locals.merge(locals)
@@ -329,7 +330,18 @@ module MemoRack
 				embed_macro(locals, @macro)
 
 				# HTMLページをレンダリングする
-				render :mustache, mustache_templ, {views: @themes}, locals
+				mustache_templ << 'page.html' if locals[:content?]
+				mustache_templ << 'index.html'
+
+				mustache_templ.each { |templ|
+					path = file_search(templ, {views: @themes}, nil)
+					next unless path
+
+					path = Pathname.new(path)
+					return render :mustache, path, {views: @themes}, locals
+				}
+
+				raise "Not found template #{mustache_templ}"
 			rescue => e
 				e.to_s
 			end
