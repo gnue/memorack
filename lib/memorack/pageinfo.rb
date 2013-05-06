@@ -125,7 +125,8 @@ module MemoRack
 		end
 
 		define_key(:title) { |key|
-			values[:title] ||= File.basename(@path, '.*')
+			values[:title] ||= I18n.t @parent[:path_info], scope: [:pages],
+											default: File.basename(@path, '.*')
 		}
 	end
 

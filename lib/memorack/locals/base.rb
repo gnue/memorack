@@ -63,7 +63,14 @@ module MemoRack
 					href = File.join(href, path_info)
 					href += @app.suffix unless @app.suffix.empty?
 
-					@pages << {name: File.basename(path_info), href: href}
+					if plugin = PageInfo[path]
+						pageinfo = plugin.new(path, nil, {path_info: path_info})
+						name = pageinfo[:title]
+					end
+
+					name ||= File.basename(path_info)
+
+					@pages << {name: name, href: href}
 				}
 			end
 
