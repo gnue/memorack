@@ -116,8 +116,8 @@ Download [highlight.js](http://softwaremaniacs.org/soft/highlight/en/)
 
 Add code to `index.html`
 
-	<link rel="stylesheet" href="/highlight.js/styles/default.css">
-	<script src="/highlight.js/highlight.pack.js"></script>
+	<link rel="stylesheet" href="{{site.url}}/highlight.js/styles/default.css">
+	<script src="{{site.url}}/highlight.js/highlight.pack.js"></script>
 	<script>hljs.initHighlightingOnLoad();</script>
 
 ### org-mode
