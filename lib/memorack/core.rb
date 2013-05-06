@@ -42,7 +42,13 @@ module MemoRack
 
 		DEFAULT_OPTIONS = DEFAULT_APP_OPTIONS.merge(DEFAULT_TEMPLATE_OPTIONS).merge(DEFAULT_LOCALS)
 
+		def self.app
+			@@app
+		end
+
 		def initialize(options={})
+			@@app = self
+
 			options = DEFAULT_OPTIONS.merge(to_sym_keys(options))
 
 			@themes_folders = [options[:themes_folder], folder(:themes)]
@@ -61,7 +67,6 @@ module MemoRack
 
 			# プラグインの読込み
 			load_plugins
-			@formats.each { |format| require_plugin(File.join('formats', format)) }
 
 			# ロケールの読込み
 			I18n.load_path = @locale_paths
