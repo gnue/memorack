@@ -1,5 +1,12 @@
 ## History
 
+### v0.1.2 / 2013-05-06
+
+* build not remove .git/.hg/.svn/.cvs direcotry
+* fix select menu script in basic theme `index.html`
+* fix comment  in basic theme `config.json`
+* fix css with bootstrap
+
 ### v0.1.1 / 2013-04-16
 
 * fix error page css URL
