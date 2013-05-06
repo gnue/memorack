@@ -19,7 +19,7 @@ module MemoRack
 				return headline
 			when /^\s*([=\-])+\s*$/
 				return nil unless prev
-		
+
 				prev = prev.strip
 				unless prev.empty?
 					level = ($1 == '=') ? 1 : 2
