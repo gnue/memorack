@@ -42,7 +42,13 @@ module MemoRack
 
 		DEFAULT_OPTIONS = DEFAULT_APP_OPTIONS.merge(DEFAULT_TEMPLATE_OPTIONS).merge(DEFAULT_LOCALS)
 
+		def self.app
+			@@app
+		end
+
 		def initialize(options={})
+			@@app = self
+
 			options = DEFAULT_OPTIONS.merge(to_sym_keys(options))
 
 			@themes_folders = [options[:themes_folder], folder(:themes)]
@@ -130,6 +136,7 @@ module MemoRack
 			@locale_paths = []
 			@macro_chain = []
 			@macro = {}
+			@plugins = Set.new
 
 			begin
 				require 'json'
@@ -204,14 +211,42 @@ module MemoRack
 		def load_plugins
 			plugins_folders.reverse.each { |folder|
 				Dir.glob(File.join(folder, '*')) { |path|
-					if File.directory?(path)
-						path = File.join(path, File.basename(path) + '.rb')
-						require_relative(path) if File.exists?(path)
-						next
-					end
-
-					require_relative(File.expand_path(path)) if path =~ /\.rb$/
+					name = path.gsub(%r[^#{folder}/], '')
+					load_plugin(name, path)
 				}
+			}
+		end
+
+		# プラグインファイルを読込む
+		def load_plugin(name, path)
+			loaded = false
+
+			if File.directory?(path)
+				path = File.join(path, File.basename(path) + '.rb')
+
+				if File.exists?(path)
+					require_relative(path)
+					loaded = true
+				end
+			elsif path =~ /\.rb$/
+				require_relative(File.expand_path(path))
+				loaded = true
+			end
+
+			if loaded
+				@plugins << name
+			end
+		end
+
+		# プラグインを読込む（読込み済みのものは読込まない）
+		def require_plugin(plugin)
+			return if @plugins.include?(plugin)
+
+			plugins_folders.reverse.each { |folder|
+				path = File.join(folder, plugin)
+				next unless File.exist?(path)
+
+				load_plugin(folder, path)
 			}
 		end
 
