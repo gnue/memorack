@@ -3,6 +3,9 @@
 require 'memorack/pageinfo'
 require 'time'
 
+require 'rubygems'
+require 'org-ruby'
+
 
 module MemoRack
 
