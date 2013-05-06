@@ -3,6 +3,7 @@
 require 'yaml'
 require 'pathname'
 require 'rubygems'
+require 'i18n'
 
 require 'memorack/tilt-mustache'
 require 'memorack/mdmenu'
@@ -60,6 +61,10 @@ module MemoRack
 
 			# プラグインの読込み
 			load_plugins
+
+			# ロケールの読込み
+			I18n.load_path = @locale_paths
+			I18n.backend.load_translations
 
 			@requires.each { |lib| require lib }
 			@locals = default_locals(@options)
@@ -122,6 +127,7 @@ module MemoRack
 			@themes ||= []
 			@options_chain = []
 			@theme_chain = []
+			@locale_paths = []
 			@macro_chain = []
 			@macro = {}
 
@@ -167,7 +173,18 @@ module MemoRack
 			macro = read_data(File.join(dir, 'macro'))
 			@macro_chain << macro if macro && macro.kind_of?(Hash)
 
+			# locale の読込み
+			@locale_paths += Dir[File.expand_path('locales/*.yml', dir)]
+
 			theme
+		end
+
+		# locale を env情報で更新する
+		def update_locale(env = ENV)
+			locale ||= env['HTTP_ACCEPT_LANGUAGE']
+			locale ||= env['LANG'] if env['LANG']
+			locale = locale[0, 2].to_sym if locale
+			I18n.locale = locale if I18n.available_locales.include?(locale)
 		end
 
 		# プラグイン・フォルダを取得する

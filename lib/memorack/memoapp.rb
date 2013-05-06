@@ -26,6 +26,9 @@ module MemoRack
 
 			path_info = unescape_path_info(env)
 
+			# ロケールの更新
+			update_locale(env)
+
 			case path_info
 			when '/'
 				content = render_with_mustache :index, :markdown

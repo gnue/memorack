@@ -15,6 +15,7 @@ module MemoRack
 			prefix:		'/',
 			suffix:		'.html',
 			uri_escape:	true,
+			env:		ENV,
 		}
 
 		DEFAULT_KEEPS = ['.git', '.hg', '.svn', '.csv']
@@ -32,6 +33,9 @@ module MemoRack
 
 			@contents = contents(options)
 			@templates = Set.new @contents.files.collect { |file| file[:path] }
+
+			# ロケールの更新
+			update_locale(options[:env])
 
 			# トップページを作成する
 			content_write(:index, '.html', output) { |template|
