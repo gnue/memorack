@@ -490,13 +490,11 @@ module MemoRack
 
 			path, ext = split_extname(path_info)
 
-			if @suffix == ''
-				fullpath = file_search(path_info, @options, exts)
+			fullpath = file_search(path_info, @options, exts)
 
-				if fullpath
-					path = path_info
-					ext = split_extname(fullpath)[1]
-				end
+			if fullpath
+				path = path_info
+				ext = split_extname(fullpath)[1]
 			end
 
 			return nil unless ext && Tilt.registered?(ext)
