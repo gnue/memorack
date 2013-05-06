@@ -131,7 +131,7 @@ module MemoRack
 			@locale_paths = []
 			@macro_chain = []
 			@macro = {}
-			@plugins = {}
+			@plugins = Set.new
 
 			begin
 				require 'json'
@@ -229,20 +229,19 @@ module MemoRack
 			end
 
 			if loaded
-				@plugins[name] = path
+				@plugins << name
 			end
 		end
 
 		# プラグインを読込む（読込み済みのものは読込まない）
 		def require_plugin(plugin)
-			return if @plugins[plugin]
+			return if @plugins.include?(plugin)
 
-			plugins_folders.each { |folder|
+			plugins_folders.reverse.each { |folder|
 				path = File.join(folder, plugin)
 				next unless File.exist?(path)
 
 				load_plugin(folder, path)
-				break;
 			}
 		end
 
