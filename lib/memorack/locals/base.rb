@@ -54,6 +54,21 @@ module MemoRack
 			@topicpath
 		end
 
+		define_key :pages do |key|
+			unless @pages
+				@pages = []
+
+				@app.pages.each { |path_info, path|
+					href = self[:site][:url].to_s
+					href = File.join(href, path_info)
+
+					@pages << {name: File.basename(path_info), href: href}
+				}
+			end
+
+			@pages
+		end
+
 	end
 
 end
