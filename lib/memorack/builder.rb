@@ -66,7 +66,7 @@ module MemoRack
 			}
 
 			# サブディレクトリの index.html を出力する
-			build_index(@directories, output, &callback)
+			build_index(@directories, output, &callback) if options[:index]
 
 			# テーマの公開ファイルをコピー
 			copy_public(@themes, output, &callback)
