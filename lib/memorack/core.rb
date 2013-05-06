@@ -12,7 +12,7 @@ require 'memorack/locals/base'
 
 module MemoRack
 	class Core
-		attr_reader :themes, :options_chain
+		attr_reader :themes, :options_chain, :suffix
 
 		DEFAULT_APP_OPTIONS = {
 			root:				'content/',
@@ -211,6 +211,29 @@ module MemoRack
 			@css_exts ||= Set.new ['css', *@css]
 		end
 
+		# テーマから固定ページのファイルを収集する
+		def pages
+			unless @pages
+				@pages = {}
+
+				@themes.each { |theme|
+					folder = File.join(theme, 'pages/')
+
+					if Dir.exists?(folder)
+						Dir.chdir(folder) { |dir|
+							Dir.glob(File.join('**/*')) { |path|
+								path_info, ext = split_extname(path)
+								path_info = File.join('', path_info)
+								@pages[path_info] ||= File.expand_path(path)
+							}
+						}
+					end
+				}
+			end
+
+			@pages
+		end
+
 		# ファイルを探す
 		def file_search(template, options = {}, exts = enable_exts)
 			options = {views: @root}.merge(options)
@@ -233,13 +256,16 @@ module MemoRack
 				return nil
 			end
 
+			dir = options[:views]
+			dir = File.join(dir, options[:folder]) if options[:folder]
+
 			if exts
 				exts.each { |ext|
-					path = File.join(options[:views], "#{template}.#{ext}")
+					path = File.join(dir, "#{template}.#{ext}")
 					return path if File.exists?(path)
 				}
 			else
-				path = File.join(options[:views], template)
+				path = File.join(dir, template)
 				return path if File.exists?(path)
 			end
 
@@ -330,6 +356,17 @@ module MemoRack
 				embed_macro(locals, @macro)
 
 				# HTMLページをレンダリングする
+				if engine && engine.to_sym == :html
+					unless template.kind_of?(Pathname)
+						path = file_search(template, @options, [engine])
+						return nil unless path
+						template = Pathname.new(path)
+					end
+
+					locals.define_key(:__content__) { |hash, key| }
+					return render :mustache, template, {views: @themes}, locals
+				end
+
 				mustache_templ << 'page.html' if locals[:content?]
 				mustache_templ << 'index.html'
 
@@ -414,6 +451,16 @@ module MemoRack
 		def render_menu
 			@menu = nil unless @directory_watcher	# ファイル監視していない場合はメニューを初期化
 			@menu ||= render :markdown, :menu, @options
+		end
+
+		# 固定ページをレンダリングする
+		def render_page(path_info, locals = {})
+			path_info = path_info.gsub(%r[(/|.html)$], '')
+			path = pages[path_info]
+			return nil unless path
+
+			ext = split_extname(path)[1]
+			content = render_with_mustache Pathname.new(path), ext, {}, locals
 		end
 
 		# コンテンツをレンダリングする

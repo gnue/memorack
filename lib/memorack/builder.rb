@@ -25,6 +25,7 @@ module MemoRack
 
 			url = @site[:url]
 			options[:prefix] = File.join(url, options[:prefix]) unless url.empty?
+			@suffix = options[:suffix]
 
 			output = File.expand_path(options[:output])
 			dir_init(output, keeps)
@@ -39,6 +40,15 @@ module MemoRack
 
 			suffix = options[:suffix]
 			suffix = '/index.html' if ['', '/'].member?(suffix)
+
+			# 固定ページのレンダリングを行う
+			pages.each { |path_info, path|
+				callback.call(path_info) if callback
+
+				content_write(path_info, suffix, output) { |template|
+					render_page template, {path_info: path_info}
+				}
+			}
 
 			# コンテンツのレンダリングを行う
 			@templates.each { |path|
