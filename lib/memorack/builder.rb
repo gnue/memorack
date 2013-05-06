@@ -48,7 +48,7 @@ module MemoRack
 			suffix = '/index.html' if ['', '/'].member?(suffix)
 
 			# サブディレクトリの index.html を出力する
-			build_index(@directories, output, &callback) if options[:index]
+			build_index(@directories, output, &callback) if options[:index] || @options[:index]
 
 			# 固定ページのレンダリングを行う
 			pages.each { |path_info, path|
