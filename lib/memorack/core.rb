@@ -28,7 +28,7 @@ module MemoRack
 
 		# テンプレートエンジンのオプション
 		DEFAULT_TEMPLATE_OPTIONS = {
-			tables:			true
+			tables:				true
 		}
 
 		# テンプレートで使用するローカル変数の初期値
@@ -67,7 +67,7 @@ module MemoRack
 
 			@themes_folders.each { |folder|
 				path = theme && File.join(folder, theme)
-				return path if File.exists?(path) && FileTest::directory?(path)
+				return path if File.exists?(path) && File.directory?(path)
 			}
 
 			nil

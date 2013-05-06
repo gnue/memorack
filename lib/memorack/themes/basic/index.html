@@ -17,7 +17,8 @@
 <script type="text/javascript">
 	$(function(){
 		// 表示しているメニューを選択
-		$('#menu a[href$="' + document.location.pathname + '"]').parent().addClass('selected');
+		$('#menu a[href="' + document.location.pathname + '"]').parent().addClass('selected');
+		$('#menu a[href="' + document.location + '"]').parent().addClass('selected');
 
 		// 外部サイトのリンクに target='_blank' を追加
 		$('a[href^=http]').not('[href*="://' + location.hostname + '"]').attr('target', '_blank');
