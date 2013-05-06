@@ -25,6 +25,7 @@ module MemoRack
 
 			url = @site[:url]
 			options[:prefix] = File.join(url, options[:prefix]) unless url.empty?
+			@suffix = options[:suffix]
 
 			output = File.expand_path(options[:output])
 			dir_init(output, keeps)

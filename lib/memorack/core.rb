@@ -12,7 +12,7 @@ require 'memorack/locals/base'
 
 module MemoRack
 	class Core
-		attr_reader :themes, :options_chain
+		attr_reader :themes, :options_chain, :suffix
 
 		DEFAULT_APP_OPTIONS = {
 			root:				'content/',
