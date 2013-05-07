@@ -62,9 +62,22 @@ module MemoRack
 			max_lines < n
 		end
 
+		# 実行アプリケーション
+		def app
+			begin
+				@parent.app
+			rescue
+			end
+		end
+
 		# git で管理されているか？
 		def git?
-			@parent[:git]
+			if @git == nil
+				@git ||= File.exists?(File.join(app.root, '.git'))
+				@git ||= File.exists?(File.join(app.root, '../.git'))
+			end
+
+			@git
 		end
 
 		# git log で更新日時一覧を取得する
