@@ -184,6 +184,7 @@ module MemoRack
 
 					local:		false,
 					prettify:	false,
+					index:		false,
 				}
 
 			options.merge!(default_options)
@@ -199,6 +200,8 @@ module MemoRack
 				t(:local)) { options[:local] = true }
 			opts.on("--prettify",
 				t(:prettify)) { options[:prettify] = true }
+			opts.on("--index",
+				t(:index)) { options[:index] = true }
 			opts.on("-h", "--help", t(:help)) { abort opts.help }
 
 			opts.parse!(argv)

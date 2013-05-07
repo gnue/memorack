@@ -33,6 +33,8 @@ module MemoRack
 
 			@contents = contents(options)
 			@templates = Set.new @contents.files.collect { |file| file[:path] }
+			@directories = Set.new @templates.collect { |path| File.dirname(path) }
+			@directories.delete('.')
 
 			# ロケールの更新
 			update_locale(options[:env])
@@ -44,6 +46,9 @@ module MemoRack
 
 			suffix = options[:suffix]
 			suffix = '/index.html' if ['', '/'].member?(suffix)
+
+			# サブディレクトリの index.html を出力する
+			build_index(@directories, output, &callback) if options[:index] || @options[:index]
 
 			# 固定ページのレンダリングを行う
 			pages.each { |path_info, path|
@@ -168,6 +173,21 @@ module MemoRack
 					fullpath = file_search(path_info, {views: views}, nil)
 					copy_file(fullpath, [output, path_info]) if fullpath
 				end
+			}
+		end
+
+		# サブディレクトリの index.html を出力する
+		def build_index(directories, output, &callback)
+			# . は取除く
+			directories.delete('.')
+
+			# index.html を出力する
+			directories.each { |path|
+				callback.call(path) if callback
+
+				content_write(path, '/index.html', output) { |template|
+					render_content template, {path_info: path}, nil
+				}
 			}
 		end
 

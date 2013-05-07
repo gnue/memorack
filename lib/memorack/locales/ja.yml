@@ -9,3 +9,4 @@ ja:
     url:    "サイトURL (省略値: %{url})"
     local:  "サイトURLをアウトプットディレクトリにする"
     prettify: "綺麗なURLになるように生成する"
+    index:    "サブディレクトリの index.html を出力する"
