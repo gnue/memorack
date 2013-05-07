@@ -132,7 +132,6 @@ module MemoRack
 		def read_config(theme, options = {})
 			@themes ||= []
 			@options_chain = []
-			@theme_chain = []
 			@locale_paths = []
 			@macro_chain = []
 			@macro = {}
