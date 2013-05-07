@@ -51,7 +51,10 @@ module MemoRack
 
 			options = DEFAULT_OPTIONS.merge(to_sym_keys(options))
 
-			@themes_folders = [options[:themes_folder], folder(:themes)]
+			@themes_folders = [options[:themes_folder], folder(:themes, :user), folder(:themes)]
+			@themes_folders.delete nil
+			@themes_folders.reject! { |folder| ! File.directory?(folder) }
+
 			read_config(options[:theme], options)
 			read_config(DEFAULT_APP_OPTIONS[:theme], options) if @themes.empty?
 
@@ -79,9 +82,22 @@ module MemoRack
 		end
 
 		# フォルダ（ディレクトリ）を取得する
-		def folder(name)
+		def folder(name, domain = :app)
 			@folders ||= {}
-			@folders[name] ||= File.expand_path(name.to_s, File.dirname(__FILE__))
+			@folders[domain] ||= {}
+
+			unless @folders[domain][name]
+				case domain
+				when :user
+					dir = File.join(ENV['HOME'], '.etc/memorack')
+				when :app
+					dir = File.dirname(__FILE__)
+				else
+					return nil
+				end
+			end
+
+			@folders[domain][name] ||= File.expand_path(name.to_s, dir)
 		end
 
 		# テーマのパスを取得する
@@ -196,7 +212,10 @@ module MemoRack
 		# プラグイン・フォルダを取得する
 		def plugins_folders
 			unless @plugins_folders
-				@plugins_folders = ['plugins/', folder(:plugins)]
+				@plugins_folders = ['plugins/', folder(:plugins, :user), folder(:plugins)]
+				@plugins_folders.delete nil
+				@plugins_folders.reject! { |folder| ! File.directory?(folder) }
+
 				@themes.each { |theme|
 					path = File.join(theme, 'plugins/')
 					@plugins_folders.unshift path if File.directory?(path)
