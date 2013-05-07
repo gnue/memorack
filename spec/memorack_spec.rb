@@ -60,7 +60,7 @@ describe MemoRack do
 				proc { memorack '-h' }.must_output nil, <<-EOD.cut_indent
 					Usage: memorack create [options] PATH
 					       memorack theme  [options] [THEME]
-					       memorack server [options] PATH
+					       memorack server [options] [PATH]
 					       memorack build  [options] [PATH]
 
 					    -h, --help                       Show this message
@@ -86,7 +86,7 @@ describe MemoRack do
 
 			it "server" do
 				proc { memorack 'server', '-h' }.must_output nil, <<-EOD.cut_indent
-					Usage: memorack server [options] PATH
+					Usage: memorack server [options] [PATH]
 
 					    -p, --port PORT                  use PORT (default: 9292)
 					    -t, --theme THEME                use THEME (default: custom)
@@ -118,7 +118,7 @@ describe MemoRack do
 				proc { memorack '-h' }.must_output nil, <<-EOD.cut_indent
 					Usage: memorack create [options] PATH
 					       memorack theme  [options] [THEME]
-					       memorack server [options] PATH
+					       memorack server [options] [PATH]
 					       memorack build  [options] [PATH]
 
 					    -h, --help                       このメッセージを表示
@@ -145,7 +145,7 @@ describe MemoRack do
 
 			it "server" do
 				proc { memorack 'server', '-h' }.must_output nil, <<-EOD.cut_indent
-					Usage: memorack server [options] PATH
+					Usage: memorack server [options] [PATH]
 
 					    -p, --port PORT                  ポートを使う (省略値: 9292)
 					    -t, --theme THEME                テーマを使う (省略値: custom)
