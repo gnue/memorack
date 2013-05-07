@@ -62,11 +62,16 @@ module MemoRack
 			max_lines < n
 		end
 
+		# git で管理されているか？
+		def git?
+			@parent[:git]
+		end
+
 		# git log で更新日時一覧を取得する
 		def log
 			unless @log
 				@log = []
-				return @log unless @parent[:git]
+				return @log unless git?
 
 				begin
 					dir, fname = File.split(@path)
