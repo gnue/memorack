@@ -152,7 +152,7 @@ module MemoRack
 		# サーバーの実行
 		define_options(:server, '[options] PATH') { |opts, argv, options|
 			default_options = {
-					theme: 'oreilly',
+					theme: 'custom',
 
 					server: {
 						environment:	ENV['RACK_ENV'] || 'development',

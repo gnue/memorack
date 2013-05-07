@@ -89,7 +89,7 @@ describe MemoRack do
 					Usage: memorack server [options] PATH
 
 					    -p, --port PORT                  use PORT (default: 9292)
-					    -t, --theme THEME                use THEME (default: oreilly)
+					    -t, --theme THEME                use THEME (default: custom)
 					    -h, --help                       Show this message
 				EOD
 			end
@@ -148,7 +148,7 @@ describe MemoRack do
 					Usage: memorack server [options] PATH
 
 					    -p, --port PORT                  ポートを使う (省略値: 9292)
-					    -t, --theme THEME                テーマを使う (省略値: oreilly)
+					    -t, --theme THEME                テーマを使う (省略値: custom)
 					    -h, --help                       このメッセージを表示
 				EOD
 			end
@@ -268,6 +268,7 @@ describe MemoRack do
 			@hash = {}
 			@hash['basic']		= '9b6d4163c422ff9304ebfec6beacb89e23715fe5'
 			@hash['oreilly']	= 'ef118f287e80648235a314980da908f70e982478'
+			@theme = 'oreilly'
 
 			@file_lists = <<-EOD.cut_indent
 				.
@@ -281,7 +282,7 @@ describe MemoRack do
 		end
 
 		it "build" do
-			theme  = 'oreilly'
+			theme  = @theme
 			output = '_site'
 
 			chmemo { |name|
@@ -295,7 +296,7 @@ describe MemoRack do
 		end
 
 		it "build PATH" do
-			theme  = 'basic'
+			theme  = @theme
 			output = '_site'
 
 			chmemo { |name|
@@ -315,7 +316,7 @@ describe MemoRack do
 		end
 
 		it "build --output DIRECTORY" do
-			theme  = 'oreilly'
+			theme  = @theme
 			output = 'output'
 
 			chmemo { |name|
@@ -343,7 +344,7 @@ describe MemoRack do
 		end
 
 		it "build --url URL" do
-			theme  = 'oreilly'
+			theme  = @theme
 			output = '_site'
 			url    = 'http://memo.pow'
 
@@ -359,7 +360,7 @@ describe MemoRack do
 		end
 
 		it "build --local" do
-			theme  = 'oreilly'
+			theme  = @theme
 			output = '_site'
 
 			chmemo { |name|
@@ -376,7 +377,7 @@ describe MemoRack do
 		end
 
 		it "build --prettify" do
-			theme  = 'oreilly'
+			theme  = @theme
 			output = '_site'
 			url    = ''
 
