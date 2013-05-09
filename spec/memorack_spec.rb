@@ -423,18 +423,21 @@ describe MemoRack do
 			get '/'
 			last_response.must_be :ok?
 			last_response.body.must_match /Powered by <a href="#{MemoRack::HOMEPAGE}"[^>]*>/
+			last_response.body.must_match %r[<title>覚書き</title>]
 		end
 
 		it "server /README" do
 			get '/README'
 			last_response.must_be :ok?
 			last_response.body.must_match /このディレクトリに markdown 等のメモファイルを作成してください/
+			last_response.body.must_match %r[<title>MemoRack について \| 覚書き</title>]
 		end
 
 		it "server /404" do
 			get '/404'
 			last_response.status.must_equal 404
 			last_response.body.must_match %r[<div id="content"><h3>Not Found</h3>\s+</div>]
+			last_response.body.must_match %r[<title>Error 404 \| 覚書き</title>]
 		end
 
 		after do
