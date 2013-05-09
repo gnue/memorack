@@ -27,7 +27,7 @@ module MemoRack
 					opts.banner = <<-BANNER.gsub(/^\t+/,'')
 						Usage: #{opts.program_name} create [options] PATH
 						       #{opts.program_name} theme  [options] [THEME]
-						       #{opts.program_name} server [options] PATH
+						       #{opts.program_name} server [options] [PATH]
 						       #{opts.program_name} build  [options] [PATH]
 					BANNER
 
@@ -150,9 +150,9 @@ module MemoRack
 		}
 
 		# サーバーの実行
-		define_options(:server, '[options] PATH') { |opts, argv, options|
+		define_options(:server, '[options] [PATH]') { |opts, argv, options|
 			default_options = {
-					theme: 'oreilly',
+					theme: 'custom',
 
 					server: {
 						environment:	ENV['RACK_ENV'] || 'development',
@@ -172,7 +172,6 @@ module MemoRack
 			opts.on("-h", "--help", t(:help)) { abort opts.help }
 
 			opts.parse!(argv)
-			abort opts.help if argv.empty?
 		}
 
 		# 静的サイトのビルド
@@ -274,7 +273,8 @@ module MemoRack
 
 		# サーバーの実行
 		def memorack_server(options, *argv)
-			path = argv.shift
+			path ||= argv.shift
+			path ||= 'content'
 			abort "Directory not exists '#{path}'" unless File.exists?(path)
 			abort "Not directory '#{path}'" unless File.directory?(path)
 
