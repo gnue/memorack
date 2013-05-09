@@ -244,9 +244,8 @@ module MemoRack
 
 			plugins_folders.reverse.each { |folder|
 				path = File.join(folder, plugin)
-				next unless File.exist?(path)
-
-				load_plugin(folder, path)
+				load_plugin(folder, path) if File.exist?(path)
+				load_plugin(folder, path + '.rb') if File.exist?(path + '.rb')
 			}
 		end
 
