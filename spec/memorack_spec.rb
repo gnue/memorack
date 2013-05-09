@@ -401,6 +401,10 @@ describe MemoRack do
 				}
 			}
 		end
+
+		it "plugin"
+		it "macro"
+		it "git"
 	end
 
 	describe "server" do
