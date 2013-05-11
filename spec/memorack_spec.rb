@@ -58,6 +58,25 @@ describe MemoRack do
 		end
 	end
 
+	# git でパッチをあてる
+	def git_am(name)
+		unless File.exists?('.git')
+			`git init`
+			`git add .`
+			`git commit -m "first commit"`
+		end
+
+		path = File.expand_path("../patches/#{name}", __FILE__)
+		if File.directory?(path)
+			Dir[File.join(path, '*.patch')].each { |path|
+				`git am -3 "#{path}"`
+			}
+		else
+			path += '.patch'
+			`git am -3 "#{path}"`
+		end
+	end
+
 	before do
 		require 'tmpdir'
 		@tmpdir = Dir.mktmpdir
