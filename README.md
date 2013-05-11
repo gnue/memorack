@@ -67,10 +67,10 @@ Template
 	├── .powenv                    -- for pow + rbenv
 	├── Gemfile                    -- `bundle install`
 	├── config.ru                  -- for rack application
-	├── content                    -- Content directory for memo
+	├── content/                   -- Content directory for memo
 	│   └── README.md              -- Sample file(remove it)
-	└── themes
-	    └── custom                 -- Default theme
+	└── themes/
+	    └── custom/                -- Default theme
 	        ├── config.json        -- Configuration
 	        └── index.md           -- Description(Show by top page)
 
@@ -87,18 +87,18 @@ Template
 
 Directory
 
-	└── themes
-	    └── custom
+	└── themes/
+	    └── custom/
 	        ├── config.json
 	        ├── index.html         <-- Edit layout
 	        └── index.md
 
 ### Logo
 
-	└── themes
-	    └── custom
+	└── themes/
+	    └── custom/
 	        ├── config.json        <-- Add "logo": "/img/logo.png"
-	        ├── img
+	        ├── img/
 	        │   └── logo.png       <-- Add image file
 	        ├── index.html         <-- Add <img id="logo" src="{{logo}}" />
 	        └── index.md
@@ -107,8 +107,8 @@ Directory
 
 Download [highlight.js](http://softwaremaniacs.org/soft/highlight/en/)
 
-	└── themes
-	    └── custom
+	└── themes/
+	    └── custom/
 	        ├── config.json
 	        ├── highlight.js       <-- `unzip highlight.zip`
 	        ├── index.html         <-- Add code
