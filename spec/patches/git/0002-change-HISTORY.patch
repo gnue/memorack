@@ -1,0 +1,19 @@
+From eacb034650f18239f9cd99f8833ebe730595b69b Mon Sep 17 00:00:00 2001
+From: gnue <gnue@so-kukan.com>
+Date: Sat, 11 May 2013 18:49:46 +0900
+Subject: [PATCH 2/3] change HISTORY
+
+---
+ content/HISTORY.md | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/content/HISTORY.md b/content/HISTORY.md
+index e69de29..a01569d 100644
+--- a/content/HISTORY.md
++++ b/content/HISTORY.md
+@@ -0,0 +1,2 @@
++## HISTORY
++
+-- 
+1.7.12.4 (Apple Git-37)
+

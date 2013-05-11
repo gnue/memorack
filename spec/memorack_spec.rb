@@ -451,7 +451,24 @@ describe MemoRack do
 			}
 		end
 
-		it "git"
+		it "git" do
+			theme  = @theme
+			output = '_site'
+
+			chmemo { |name|
+				git_am 'git'
+				proc { memorack 'build' }.must_output "Build 'content/' -> '#{output}'\n"
+
+				Dir.chdir(output) { |output|
+					ctime = '<div>作成時間：2013-05-11 18:47:31 +0900</div>'
+					mtime = '<div>更新時間：2013-05-11 18:49:46 +0900</div>'
+
+					history = File.read('HISTORY.html')
+					history.must_match /#{Regexp.escape ctime}/
+					history.must_match /#{Regexp.escape mtime}/
+				}
+			}
+		end
 	end
 
 	describe "server" do
