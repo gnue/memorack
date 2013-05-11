@@ -45,6 +45,12 @@ describe MemoRack do
 		}
 	end
 
+	# パッチをあてる
+	def patch(name)
+		path = File.expand_path("../patches/#{name}.patch", __FILE__)
+		`patch -p1 < #{path}`
+	end
+
 	before do
 		require 'tmpdir'
 		@tmpdir = Dir.mktmpdir
