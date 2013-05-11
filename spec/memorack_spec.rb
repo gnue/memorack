@@ -216,10 +216,17 @@ describe MemoRack do
 					./content
 					./content/README.md
 					./Gemfile
+					./plugins
+					./plugins/.gitkeep
 					./themes
 					./themes/custom
 					./themes/custom/config.json
 					./themes/custom/index.md
+					./themes/custom/locales
+					./themes/custom/locales/.gitkeep
+					./themes/custom/macro.yml
+					./themes/custom/pages
+					./themes/custom/pages/.gitkeep
 				EOD
 			}
 		end
@@ -261,6 +268,11 @@ describe MemoRack do
 					custom --> [oreilly] --> [basic]
 					  config.json
 					  index.md
+					  locales/
+					  locales/.gitkeep
+					  macro.yml
+					  pages/
+					  pages/.gitkeep
 				EOD
 			}
 		end
