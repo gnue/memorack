@@ -69,10 +69,14 @@ Template
 	├── config.ru                  -- for rack application
 	├── content/                   -- Content directory for memo
 	│   └── README.md              -- Sample file(remove it)
+	├── plugins/					-- Plugins directory
 	└── themes/
 	    └── custom/                -- Default theme
 	        ├── config.json        -- Configuration
-	        └── index.md           -- Description(Show by top page)
+	        ├── index.md           -- Description(Show by top page)
+	        ├── locales/			-- Locales directory
+	        ├── macro.yml			-- Macro
+	        └── pages/				-- Pages directory
 
 ## Customization
 
