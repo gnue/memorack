@@ -155,7 +155,6 @@ Special variables -- `{{{VAR}}}`
 * Template comments translate english
 * Add customizing tips
 * More test program
-* Plugin
 * Generate EPUB3
 
 ## Contributing
