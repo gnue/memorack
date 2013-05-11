@@ -22,8 +22,8 @@ Or install it yourself as:
 	$ memorack theme					# Show theme list
 	$ memorack theme THEME				# Show theme info
 	$ memorack theme -c THEME			# Copy theme
-	$ memorack server PATH				# Instant Server
-	$ memorack build [PATH]				# Build static site
+	$ memorack server [PATH]			# Instant Server
+	$ memorack build  [PATH]			# Build static site
 
 Standard startup
 
