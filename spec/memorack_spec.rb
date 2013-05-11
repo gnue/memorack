@@ -47,8 +47,15 @@ describe MemoRack do
 
 	# パッチをあてる
 	def patch(name)
-		path = File.expand_path("../patches/#{name}.patch", __FILE__)
-		`patch -p1 < #{path}`
+		path = File.expand_path("../patches/#{name}", __FILE__)
+		if File.directory?(path)
+			Dir[File.join(path, '*.patch')].each { |path|
+				`patch -p1 < "#{path}"`
+			}
+		else
+			path += '.patch'
+			`patch -p1 < "#{path}"`
+		end
 	end
 
 	before do
