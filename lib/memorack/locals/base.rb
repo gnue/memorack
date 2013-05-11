@@ -8,6 +8,8 @@ module MemoRack
 
 	class BaseLocals < Locals
 
+		attr_reader :app
+
 		def initialize(app, hash = nil, ifnone = nil)
 			super ifnone
 
