@@ -223,6 +223,8 @@ describe MemoRack do
 					./themes/custom/config.json
 					./themes/custom/index.md
 					./themes/custom/macro.yml
+					./themes/custom/pages
+					./themes/custom/pages/.gitkeep
 				EOD
 			}
 		end
@@ -265,6 +267,8 @@ describe MemoRack do
 					  config.json
 					  index.md
 					  macro.yml
+					  pages/
+					  pages/.gitkeep
 				EOD
 			}
 		end
