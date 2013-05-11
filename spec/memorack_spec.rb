@@ -3,6 +3,7 @@
 require File.expand_path('../spec_helper', __FILE__)
 require 'memorack'
 require 'memorack/cli'
+require 'cgi'
 
 
 describe MemoRack do
@@ -434,7 +435,20 @@ describe MemoRack do
 			}
 		end
 
-		it "plugin"
+		it "plugin" do
+			theme  = @theme
+			output = '_site'
+
+			chmemo { |name|
+				patch 'plugin'
+				proc { memorack 'build' }.must_output "Build 'content/' -> '#{output}'\n"
+
+				Dir.chdir(output) { |output|
+					theme_chain = 'Theme (custom --> oreilly --> basic)'
+					File.read('index.html').must_match /#{Regexp.escape CGI.escapeHTML theme_chain}/
+				}
+			}
+		end
 
 		it "macro" do
 			theme  = @theme
