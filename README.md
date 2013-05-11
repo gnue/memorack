@@ -130,7 +130,6 @@ Edit `config.json`
 
 	{
 		"formats":		["markdown", "org"],
-		"requires":		["org-ruby"],
 		...
 	}
 
