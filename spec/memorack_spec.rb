@@ -409,7 +409,22 @@ describe MemoRack do
 		end
 
 		it "plugin"
-		it "macro"
+
+		it "macro" do
+			theme  = @theme
+			output = '_site'
+
+			chmemo { |name|
+				patch 'macro'
+				proc { memorack 'build' }.must_output "Build 'content/' -> '#{output}'\n"
+
+				Dir.chdir(output) { |output|
+					File.read('index.html').must_match %r[<title>覚書き</title>]
+					File.read('README.html').must_match %r[<title>MemoRack について ≫ 覚書き</title>]
+				}
+			}
+		end
+
 		it "git"
 	end
 
