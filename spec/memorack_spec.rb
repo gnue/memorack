@@ -216,6 +216,8 @@ describe MemoRack do
 					./content
 					./content/README.md
 					./Gemfile
+					./plugins
+					./plugins/.gitkeep
 					./themes
 					./themes/custom
 					./themes/custom/config.json
