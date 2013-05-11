@@ -3,6 +3,7 @@
 require File.expand_path('../spec_helper', __FILE__)
 require 'memorack'
 require 'memorack/cli'
+require 'cgi'
 
 
 describe MemoRack do
@@ -45,6 +46,38 @@ describe MemoRack do
 		}
 	end
 
+	# パッチをあてる
+	def patch(name)
+		path = File.expand_path("../patches/#{name}", __FILE__)
+		if File.directory?(path)
+			Dir[File.join(path, '*.patch')].each { |path|
+				`patch -p1 < "#{path}"`
+			}
+		else
+			path += '.patch'
+			`patch -p1 < "#{path}"`
+		end
+	end
+
+	# git でパッチをあてる
+	def git_am(name)
+		unless File.exists?('.git')
+			`git init`
+			`git add .`
+			`git commit -m "first commit"`
+		end
+
+		path = File.expand_path("../patches/#{name}", __FILE__)
+		if File.directory?(path)
+			Dir[File.join(path, '*.patch')].each { |path|
+				`git am -3 "#{path}"`
+			}
+		else
+			path += '.patch'
+			`git am -3 "#{path}"`
+		end
+	end
+
 	before do
 		require 'tmpdir'
 		@tmpdir = Dir.mktmpdir
@@ -60,7 +93,7 @@ describe MemoRack do
 				proc { memorack '-h' }.must_output nil, <<-EOD.cut_indent
 					Usage: memorack create [options] PATH
 					       memorack theme  [options] [THEME]
-					       memorack server [options] PATH
+					       memorack server [options] [PATH]
 					       memorack build  [options] [PATH]
 
 					    -h, --help                       Show this message
@@ -86,10 +119,10 @@ describe MemoRack do
 
 			it "server" do
 				proc { memorack 'server', '-h' }.must_output nil, <<-EOD.cut_indent
-					Usage: memorack server [options] PATH
+					Usage: memorack server [options] [PATH]
 
 					    -p, --port PORT                  use PORT (default: 9292)
-					    -t, --theme THEME                use THEME (default: oreilly)
+					    -t, --theme THEME                use THEME (default: custom)
 					    -h, --help                       Show this message
 				EOD
 			end
@@ -103,6 +136,7 @@ describe MemoRack do
 					        --url URL                    Site URL (default: )
 					        --local                      Site URL is output directory
 					        --prettify                   prettify URL
+					        --index                      output index.html of sub directory
 					    -h, --help                       Show this message
 				EOD
 			end
@@ -117,7 +151,7 @@ describe MemoRack do
 				proc { memorack '-h' }.must_output nil, <<-EOD.cut_indent
 					Usage: memorack create [options] PATH
 					       memorack theme  [options] [THEME]
-					       memorack server [options] PATH
+					       memorack server [options] [PATH]
 					       memorack build  [options] [PATH]
 
 					    -h, --help                       このメッセージを表示
@@ -144,10 +178,10 @@ describe MemoRack do
 
 			it "server" do
 				proc { memorack 'server', '-h' }.must_output nil, <<-EOD.cut_indent
-					Usage: memorack server [options] PATH
+					Usage: memorack server [options] [PATH]
 
 					    -p, --port PORT                  ポートを使う (省略値: 9292)
-					    -t, --theme THEME                テーマを使う (省略値: oreilly)
+					    -t, --theme THEME                テーマを使う (省略値: custom)
 					    -h, --help                       このメッセージを表示
 				EOD
 			end
@@ -161,6 +195,7 @@ describe MemoRack do
 					        --url URL                    サイトURL (省略値: )
 					        --local                      サイトURLをアウトプットディレクトリにする
 					        --prettify                   綺麗なURLになるように生成する
+					        --index                      サブディレクトリの index.html を出力する
 					    -h, --help                       このメッセージを表示
 				EOD
 			end
@@ -181,10 +216,17 @@ describe MemoRack do
 					./content
 					./content/README.md
 					./Gemfile
+					./plugins
+					./plugins/.gitkeep
 					./themes
 					./themes/custom
 					./themes/custom/config.json
 					./themes/custom/index.md
+					./themes/custom/locales
+					./themes/custom/locales/.gitkeep
+					./themes/custom/macro.yml
+					./themes/custom/pages
+					./themes/custom/pages/.gitkeep
 				EOD
 			}
 		end
@@ -226,6 +268,11 @@ describe MemoRack do
 					custom --> [oreilly] --> [basic]
 					  config.json
 					  index.md
+					  locales/
+					  locales/.gitkeep
+					  macro.yml
+					  pages/
+					  pages/.gitkeep
 				EOD
 			}
 		end
@@ -266,6 +313,7 @@ describe MemoRack do
 			@hash = {}
 			@hash['basic']		= '9b6d4163c422ff9304ebfec6beacb89e23715fe5'
 			@hash['oreilly']	= 'ef118f287e80648235a314980da908f70e982478'
+			@theme = 'oreilly'
 
 			@file_lists = <<-EOD.cut_indent
 				.
@@ -279,7 +327,7 @@ describe MemoRack do
 		end
 
 		it "build" do
-			theme  = 'oreilly'
+			theme  = @theme
 			output = '_site'
 
 			chmemo { |name|
@@ -293,7 +341,7 @@ describe MemoRack do
 		end
 
 		it "build PATH" do
-			theme  = 'basic'
+			theme  = @theme
 			output = '_site'
 
 			chmemo { |name|
@@ -313,7 +361,7 @@ describe MemoRack do
 		end
 
 		it "build --output DIRECTORY" do
-			theme  = 'oreilly'
+			theme  = @theme
 			output = 'output'
 
 			chmemo { |name|
@@ -341,7 +389,7 @@ describe MemoRack do
 		end
 
 		it "build --url URL" do
-			theme  = 'oreilly'
+			theme  = @theme
 			output = '_site'
 			url    = 'http://memo.pow'
 
@@ -351,13 +399,13 @@ describe MemoRack do
 				Dir.chdir(output) { |output|
 					`find . -print`.must_equal @file_lists
 					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
-					File.read('index.html').must_match %r[<a href="#{url}/README.html">README</a>]
+					File.read('index.html').must_match %r[<a href="#{url}/README.html">MemoRack について</a>]
 				}
 			}
 		end
 
 		it "build --local" do
-			theme  = 'oreilly'
+			theme  = @theme
 			output = '_site'
 
 			chmemo { |name|
@@ -368,13 +416,13 @@ describe MemoRack do
 				Dir.chdir(output) { |output|
 					`find . -print`.must_equal @file_lists
 					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
-					File.read('index.html').must_match %r[<a href="#{url}/README.html">README</a>]
+					File.read('index.html').must_match %r[<a href="#{url}/README.html">MemoRack について</a>]
 				}
 			}
 		end
 
 		it "build --prettify" do
-			theme  = 'oreilly'
+			theme  = @theme
 			output = '_site'
 			url    = ''
 
@@ -394,7 +442,56 @@ describe MemoRack do
 					EOD
 
 					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
-					File.read('index.html').must_match %r[<a href="#{url}/README">README</a>]
+					File.read('index.html').must_match %r[<a href="#{url}/README">MemoRack について</a>]
+				}
+			}
+		end
+
+		it "plugin" do
+			theme  = @theme
+			output = '_site'
+
+			chmemo { |name|
+				patch 'plugin'
+				proc { memorack 'build' }.must_output "Build 'content/' -> '#{output}'\n"
+
+				Dir.chdir(output) { |output|
+					theme_chain = 'Theme (custom --> oreilly --> basic)'
+					File.read('index.html').must_match /#{Regexp.escape CGI.escapeHTML theme_chain}/
+				}
+			}
+		end
+
+		it "macro" do
+			theme  = @theme
+			output = '_site'
+
+			chmemo { |name|
+				patch 'macro'
+				proc { memorack 'build' }.must_output "Build 'content/' -> '#{output}'\n"
+
+				Dir.chdir(output) { |output|
+					File.read('index.html').must_match %r[<title>覚書き</title>]
+					File.read('README.html').must_match %r[<title>MemoRack について ≫ 覚書き</title>]
+				}
+			}
+		end
+
+		it "git" do
+			theme  = @theme
+			output = '_site'
+
+			chmemo { |name|
+				git_am 'git'
+				proc { memorack 'build' }.must_output "Build 'content/' -> '#{output}'\n"
+
+				Dir.chdir(output) { |output|
+					ctime = '<div>作成時間：2013-05-11 18:47:31 +0900</div>'
+					mtime = '<div>更新時間：2013-05-11 18:49:46 +0900</div>'
+
+					history = File.read('HISTORY.html')
+					history.must_match /#{Regexp.escape ctime}/
+					history.must_match /#{Regexp.escape mtime}/
 				}
 			}
 		end
@@ -420,18 +517,21 @@ describe MemoRack do
 			get '/'
 			last_response.must_be :ok?
 			last_response.body.must_match /Powered by <a href="#{MemoRack::HOMEPAGE}"[^>]*>/
+			last_response.body.must_match %r[<title>覚書き</title>]
 		end
 
 		it "server /README" do
 			get '/README'
 			last_response.must_be :ok?
 			last_response.body.must_match /このディレクトリに markdown 等のメモファイルを作成してください/
+			last_response.body.must_match %r[<title>MemoRack について \| 覚書き</title>]
 		end
 
 		it "server /404" do
 			get '/404'
 			last_response.status.must_equal 404
 			last_response.body.must_match %r[<div id="content"><h3>Not Found</h3>\s+</div>]
+			last_response.body.must_match %r[<title>Error 404 \| 覚書き</title>]
 		end
 
 		after do

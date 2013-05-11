@@ -9,3 +9,4 @@ en:
     url:    "Site URL (default: %{url})"
     local:  "Site URL is output directory"
     prettify: "prettify URL"
+    index:    "output index.html of sub directory"

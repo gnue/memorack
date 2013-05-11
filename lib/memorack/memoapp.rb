@@ -6,6 +6,7 @@ require 'rack'
 require 'uri'
 
 require 'memorack/core'
+require 'memorack/pageinfo'
 
 module MemoRack
 	class MemoApp < Core
@@ -25,6 +26,9 @@ module MemoRack
 
 			path_info = unescape_path_info(env)
 
+			# ロケールの更新
+			update_locale(env)
+
 			case path_info
 			when '/'
 				content = render_with_mustache :index, :markdown
@@ -40,7 +44,8 @@ module MemoRack
 				end
 			else
 				locals = {env: env, path_info: path_info}
-				content = render_content(path_info, locals)
+				content ||= render_content(path_info, locals)
+				content ||= render_page(path_info, locals)
 			end
 
 			return [200, {'Content-Type' => content_type}, [content.to_s]] if content
@@ -148,7 +153,7 @@ module MemoRack
 
 		# メニューを作成
 		template :menu do
-			contents.generate(StringIO.new).string
+			contents.generate(StringIO.new, &method(:content_name).to_proc).string
 		end
 
 	end

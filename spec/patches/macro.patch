@@ -1,0 +1,20 @@
+From ddde53a6febdced05acd0bb6b5fdb7d764ee44fc Mon Sep 17 00:00:00 2001
+From: gnue <gnue@so-kukan.com>
+Date: Sat, 11 May 2013 23:07:58 +0900
+Subject: [PATCH] change page.title
+
+---
+ themes/custom/macro.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/themes/custom/macro.yml b/themes/custom/macro.yml
+index 9432c55..695ca34 100644
+--- a/themes/custom/macro.yml
++++ b/themes/custom/macro.yml
+@@ -1,2 +1,2 @@
+ page:
+-  title: '{{#content?}}{{page.name}} | {{/content?}}{{title}}'
++  title: '{{#content?}}{{page.name}} ≫ {{/content?}}{{title}}'
+-- 
+1.7.12.4 (Apple Git-37)
+

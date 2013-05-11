@@ -1,5 +1,20 @@
 ## History
 
+### v0.2.0 / 2013-05-12
+
+* plugin
+* macro
+* pages
+* add `page.html` for content template
+* support user domain themes/plugins folder (ex. `~/.etc/memorack/themes/`)
+* yaml support for configuration (ex. `config.yml`)
+* page title from content headline (markdown/org only)
+* page title from locale (pages)
+* page created/modified time
+* to optional path of server subcommand (default: `content`)
+* add option `--index` of build subcommand
+* change default values
+
 ### v0.1.2 / 2013-05-06
 
 * build not remove .git/.hg/.svn/.cvs direcotry

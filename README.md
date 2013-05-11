@@ -22,8 +22,8 @@ Or install it yourself as:
 	$ memorack theme					# Show theme list
 	$ memorack theme THEME				# Show theme info
 	$ memorack theme -c THEME			# Copy theme
-	$ memorack server PATH				# Instant Server
-	$ memorack build [PATH]				# Build static site
+	$ memorack server [PATH]			# Instant Server
+	$ memorack build  [PATH]			# Build static site
 
 Standard startup
 
@@ -67,12 +67,16 @@ Template
 	├── .powenv                    -- for pow + rbenv
 	├── Gemfile                    -- `bundle install`
 	├── config.ru                  -- for rack application
-	├── content                    -- Content directory for memo
+	├── content/                   -- Content directory for memo
 	│   └── README.md              -- Sample file(remove it)
-	└── themes
-	    └── custom                 -- Default theme
+	├── plugins/					-- Plugins directory
+	└── themes/
+	    └── custom/                -- Default theme
 	        ├── config.json        -- Configuration
-	        └── index.md           -- Description(Show by top page)
+	        ├── index.md           -- Description(Show by top page)
+	        ├── locales/			-- Locales directory
+	        ├── macro.yml			-- Macro
+	        └── pages/				-- Pages directory
 
 ## Customization
 
@@ -87,18 +91,18 @@ Template
 
 Directory
 
-	└── themes
-	    └── custom
+	└── themes/
+	    └── custom/
 	        ├── config.json
 	        ├── index.html         <-- Edit layout
 	        └── index.md
 
 ### Logo
 
-	└── themes
-	    └── custom
+	└── themes/
+	    └── custom/
 	        ├── config.json        <-- Add "logo": "/img/logo.png"
-	        ├── img
+	        ├── img/
 	        │   └── logo.png       <-- Add image file
 	        ├── index.html         <-- Add <img id="logo" src="{{logo}}" />
 	        └── index.md
@@ -107,8 +111,8 @@ Directory
 
 Download [highlight.js](http://softwaremaniacs.org/soft/highlight/en/)
 
-	└── themes
-	    └── custom
+	└── themes/
+	    └── custom/
 	        ├── config.json
 	        ├── highlight.js       <-- `unzip highlight.zip`
 	        ├── index.html         <-- Add code
@@ -130,7 +134,6 @@ Edit `config.json`
 
 	{
 		"formats":		["markdown", "org"],
-		"requires":		["org-ruby"],
 		...
 	}
 
@@ -156,7 +159,6 @@ Special variables -- `{{{VAR}}}`
 * Template comments translate english
 * Add customizing tips
 * More test program
-* Plugin
 * Generate EPUB3
 
 ## Contributing

@@ -15,6 +15,7 @@ module MemoRack
 			prefix:		'/',
 			suffix:		'.html',
 			uri_escape:	true,
+			env:		ENV,
 		}
 
 		DEFAULT_KEEPS = ['.git', '.hg', '.svn', '.csv']
@@ -25,12 +26,18 @@ module MemoRack
 
 			url = @site[:url]
 			options[:prefix] = File.join(url, options[:prefix]) unless url.empty?
+			@suffix = options[:suffix]
 
 			output = File.expand_path(options[:output])
 			dir_init(output, keeps)
 
 			@contents = contents(options)
 			@templates = Set.new @contents.files.collect { |file| file[:path] }
+			@directories = Set.new @templates.collect { |path| File.dirname(path) }
+			@directories.delete('.')
+
+			# ロケールの更新
+			update_locale(options[:env])
 
 			# トップページを作成する
 			content_write(:index, '.html', output) { |template|
@@ -40,12 +47,24 @@ module MemoRack
 			suffix = options[:suffix]
 			suffix = '/index.html' if ['', '/'].member?(suffix)
 
+			# サブディレクトリの index.html を出力する
+			build_index(@directories, output, &callback) if options[:index] || @options[:index]
+
+			# 固定ページのレンダリングを行う
+			pages.each { |path_info, path|
+				callback.call(path_info) if callback
+
+				content_write(path_info, suffix, output) { |template|
+					render_page template, {path_info: path_info}
+				}
+			}
+
 			# コンテンツのレンダリングを行う
 			@templates.each { |path|
 				callback.call(path) if callback
 
 				content_write(path, suffix, output) { |template|
-					render_content(template)
+					render_content template, {path_info: path}, nil
 				}
 			}
 
@@ -157,6 +176,21 @@ module MemoRack
 			}
 		end
 
+		# サブディレクトリの index.html を出力する
+		def build_index(directories, output, &callback)
+			# . は取除く
+			directories.delete('.')
+
+			# index.html を出力する
+			directories.each { |path|
+				callback.call(path) if callback
+
+				content_write(path, '/index.html', output) { |template|
+					render_content template, {path_info: path}, nil
+				}
+			}
+		end
+
 		#### テンプレート
 
 		# インデックスを作成
@@ -170,7 +204,7 @@ module MemoRack
 
 		# メニューを作成
 		template :menu do
-			@contents.generate(StringIO.new).string
+			@contents.generate(StringIO.new, &method(:content_name).to_proc).string
 		end
 
 	end

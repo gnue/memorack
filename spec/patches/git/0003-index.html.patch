@@ -1,0 +1,75 @@
+From 3dbf53d1c486ff86cbbd229c9c42f9d8260c2349 Mon Sep 17 00:00:00 2001
+From: gnue <gnue@so-kukan.com>
+Date: Sat, 11 May 2013 18:58:35 +0900
+Subject: [PATCH 3/3] =?UTF-8?q?index.html=20=E3=82=92=E8=BF=BD=E5=8A=A0?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ themes/custom/index.html | 53 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 53 insertions(+)
+ create mode 100644 themes/custom/index.html
+
+diff --git a/themes/custom/index.html b/themes/custom/index.html
+new file mode 100644
+index 0000000..2fa51a5
+--- /dev/null
++++ b/themes/custom/index.html
+@@ -0,0 +1,53 @@
++<!DOCTYPE html>
++<html>
++<head>
++<meta charset="utf-8" />
++
++<style>
++  article, aside, dialog, figure, footer, header,
++  hgroup, menu, nav, section { display: block; }
++</style>
++
++<meta name="keywords" content="" />
++<meta name="description" content="" />
++<title>{{page.title}}</title>
++
++<link type="text/css" href="{{site.url}}/css/styles.css" rel="stylesheet" media="all" />
++<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
++<script type="text/javascript">
++	$(function(){
++		// 表示しているメニューを選択
++		$('#menu a[href="' + document.location.pathname + '"]').parent().addClass('selected');
++		$('#menu a[href="' + document.location + '"]').parent().addClass('selected');
++
++		// 外部サイトのリンクに target='_blank' を追加
++		$('a[href^=http]').not('[href*="://' + location.hostname + '"]').attr('target', '_blank');
++	});
++</script>
++
++</head>
++<body>
++  <div id="page">
++    <header>
++      <h1><a href="{{site.url}}/">{{title}}</a></h1>
++    </header>
++
++    <div id="content-container">
++      <div id="menu" class="importdoc">{{{__menu__}}}</div>
++      <div id="content">
++        {{#content?}}
++        <div>作成時間：{{page.ctime}}</div>
++        <div>更新時間：{{page.mtime}}</div>
++        {{/content?}}
++
++        {{{__content__}}}
++      </div>
++      <div class="clear"></div>
++    </div>
++
++    <footer>
++      <p>Powered by <a href="{{app.url}}" target="_blank"> {{app.name}} {{app.version}}</a></p>
++    </footer>
++  </div>
++</body>
++</html>
+-- 
+1.7.12.4 (Apple Git-37)
+
