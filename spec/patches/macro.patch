@@ -1,20 +1,19 @@
-From 738267d0f8c3130bdce7b88a13f9dafda0a9911e Mon Sep 17 00:00:00 2001
+From ddde53a6febdced05acd0bb6b5fdb7d764ee44fc Mon Sep 17 00:00:00 2001
 From: gnue <gnue@so-kukan.com>
-Date: Sat, 11 May 2013 18:07:51 +0900
+Date: Sat, 11 May 2013 23:07:58 +0900
 Subject: [PATCH] change page.title
 
 ---
- themes/custom/macro.yml | 2 ++
- 1 file changed, 2 insertions(+)
- create mode 100644 themes/custom/macro.yml
+ themes/custom/macro.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/themes/custom/macro.yml b/themes/custom/macro.yml
-new file mode 100644
-index 0000000..695ca34
---- /dev/null
+index 9432c55..695ca34 100644
+--- a/themes/custom/macro.yml
 +++ b/themes/custom/macro.yml
-@@ -0,0 +1,2 @@
-+page:
+@@ -1,2 +1,2 @@
+ page:
+-  title: '{{#content?}}{{page.name}} | {{/content?}}{{title}}'
 +  title: '{{#content?}}{{page.name}} ≫ {{/content?}}{{title}}'
 -- 
 1.7.12.4 (Apple Git-37)

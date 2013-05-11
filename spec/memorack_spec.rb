@@ -220,6 +220,7 @@ describe MemoRack do
 					./themes/custom
 					./themes/custom/config.json
 					./themes/custom/index.md
+					./themes/custom/macro.yml
 				EOD
 			}
 		end
@@ -261,6 +262,7 @@ describe MemoRack do
 					custom --> [oreilly] --> [basic]
 					  config.json
 					  index.md
+					  macro.yml
 				EOD
 			}
 		end
