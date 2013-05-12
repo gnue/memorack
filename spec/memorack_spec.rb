@@ -208,7 +208,7 @@ describe MemoRack do
 
 			Dir.chdir(@tmpdir) {
 				proc { memorack 'create', name }.must_output "Created '#{name}'\n"
-				`cd #{name}; find . -print`.must_equal <<-EOD.cut_indent
+				`cd #{name}; find . -print | sort -f`.must_equal <<-EOD.cut_indent
 					.
 					./.gitignore
 					./.powenv
@@ -283,7 +283,7 @@ describe MemoRack do
 			chmemo { |name|
 				proc { memorack 'theme', '-c', theme }.must_output "Created 'themes/#{theme}'\n"
 
-				`cd themes/#{theme}; find . -print`.must_equal <<-EOD.cut_indent
+				`cd themes/#{theme}; find . -print | sort -f`.must_equal <<-EOD.cut_indent
 					.
 					./404.md
 					./config.json
@@ -334,7 +334,7 @@ describe MemoRack do
 				proc { memorack 'build' }.must_output "Build 'content/' -> '#{output}'\n"
 
 				Dir.chdir(output) { |output|
-					`find . -print`.must_equal @file_lists
+					`find . -print | sort -f`.must_equal @file_lists
 					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
 				}
 			}
@@ -354,7 +354,7 @@ describe MemoRack do
 				proc { memorack 'build', path }.must_output "Build '#{path}' -> '#{output}'\n"
 
 				Dir.chdir(output) { |output|
-					`find . -print`.must_equal @file_lists
+					`find . -print | sort -f`.must_equal @file_lists
 					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
 				}
 			}
@@ -368,7 +368,7 @@ describe MemoRack do
 				proc { memorack 'build', '--output', output }.must_output "Build 'content/' -> '#{output}'\n"
 
 				Dir.chdir(output) { |output|
-					`find . -print`.must_equal @file_lists
+					`find . -print | sort -f`.must_equal @file_lists
 					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
 				}
 			}
@@ -382,7 +382,7 @@ describe MemoRack do
 				proc { memorack 'build', '--theme', theme }.must_output "Build 'content/' -> '#{output}'\n"
 
 				Dir.chdir(output) { |output|
-					`find . -print`.must_equal @file_lists
+					`find . -print | sort -f`.must_equal @file_lists
 					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
 				}
 			}
@@ -397,7 +397,7 @@ describe MemoRack do
 				proc { memorack 'build', '--url', url }.must_output "Build 'content/' -> '#{output}'\n"
 
 				Dir.chdir(output) { |output|
-					`find . -print`.must_equal @file_lists
+					`find . -print | sort -f`.must_equal @file_lists
 					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
 					File.read('index.html').must_match %r[<a href="#{url}/README.html">MemoRack について</a>]
 				}
@@ -414,7 +414,7 @@ describe MemoRack do
 				proc { memorack 'build', '--local' }.must_output "Build 'content/' -> '#{output}'\n"
 
 				Dir.chdir(output) { |output|
-					`find . -print`.must_equal @file_lists
+					`find . -print | sort -f`.must_equal @file_lists
 					`git hash-object css/styles.css`.must_equal @hash[theme]+"\n"
 					File.read('index.html').must_match %r[<a href="#{url}/README.html">MemoRack について</a>]
 				}
@@ -430,7 +430,7 @@ describe MemoRack do
 				proc { memorack 'build', '--prettify' }.must_output "Build 'content/' -> '#{output}'\n"
 
 				Dir.chdir(output) { |output|
-					`find . -print`.must_equal <<-EOD.cut_indent
+					`find . -print | sort -f`.must_equal <<-EOD.cut_indent
 						.
 						./css
 						./css/2-column.css
