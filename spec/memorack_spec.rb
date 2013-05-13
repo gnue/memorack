@@ -74,7 +74,7 @@ describe MemoRack do
 
 		path = File.expand_path("../patches/#{name}", __FILE__)
 		if File.directory?(path)
-			Dir[File.join(path, '*.patch')].each { |path|
+			Dir[File.join(path, '*.patch')].sort.each { |path|
 				`git am -3 "#{path}"`
 			}
 		else
