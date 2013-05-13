@@ -84,7 +84,9 @@ describe MemoRack do
 		files = files.split("\n") if files.kind_of?(String)
 
 		Dir.chdir(path || '.') { |dir|
-			Set.new(Dir.glob('**/*', File::FNM_DOTMATCH)).must_equal Set.new(files)
+			list = Dir.glob('**/*', File::FNM_DOTMATCH)
+			list.reject! { |item| item =~ %r[(^|/)\.{1,2}$] }
+			Set.new(list).must_equal Set.new(files)
 		}
 	end
 
