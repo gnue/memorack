@@ -3,6 +3,7 @@
 require File.expand_path('../spec_helper', __FILE__)
 require 'memorack'
 require 'memorack/cli'
+require 'time'
 require 'cgi'
 require 'set'
 
@@ -499,12 +500,12 @@ describe MemoRack do
 				proc { memorack 'build' }.must_output "Build 'content/' -> '#{output}'\n"
 
 				Dir.chdir(output) { |output|
-					ctime = '<div>作成時間：2013-05-11 18:47:31 +0900</div>'
-					mtime = '<div>更新時間：2013-05-11 18:49:46 +0900</div>'
+					ctime = Time.parse '2013-05-11 18:47:31 +0900'
+					mtime = Time.parse '2013-05-11 18:49:46 +0900'
 
 					history = File.read('HISTORY.html')
-					history.must_match /#{Regexp.escape ctime}/
-					history.must_match /#{Regexp.escape mtime}/
+					history.must_match /#{Regexp.escape "<div>作成時間：#{ctime}</div>"}/
+					history.must_match /#{Regexp.escape "<div>更新時間：#{mtime}</div>"}/
 				}
 			}
 		end
