@@ -61,7 +61,9 @@ describe MemoRack do
 	end
 
 	# git でパッチをあてる
-	def git_am(name)
+	def git_am(name, init = false)
+		FileUtils.remove_entry_secure('.git') if init && File.exists?('.git')
+
 		unless File.exists?('.git')
 			`git init`
 			`git config --local user.email "you@example.com"`
@@ -493,7 +495,7 @@ describe MemoRack do
 			output = '_site'
 
 			chmemo { |name|
-				git_am 'git'
+				git_am 'git', true
 				proc { memorack 'build' }.must_output "Build 'content/' -> '#{output}'\n"
 
 				Dir.chdir(output) { |output|
