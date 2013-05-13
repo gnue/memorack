@@ -64,6 +64,8 @@ describe MemoRack do
 	def git_am(name)
 		unless File.exists?('.git')
 			`git init`
+			`git config --local user.email "you@example.com"`
+			`git config --local user.name "Your Name"`
 			`git add .`
 			`git commit -m "first commit"`
 		end
