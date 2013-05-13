@@ -65,7 +65,7 @@ module MemoRack
 		# ディレクトリを繰返す
 		def dir_earch(dir, match = '**/*', flag = File::FNM_DOTMATCH)
 			Dir.chdir(dir) { |d|
-				Dir.glob(match, flag).each { |file|
+				Dir.glob(match, flag).sort.each { |file|
 					next if File.basename(file) =~ /^[.]{1,2}$/
 					file = File.join(file, '') if File.directory?(file)
 					yield(file)
@@ -79,9 +79,11 @@ module MemoRack
 
 			puts "#{domain}:"
 
-			Dir.foreach(themes) { |file|
-				next if /^\./ =~ file
-				puts "  #{file}"
+			Dir.open(themes) { |dir|
+				dir.sort.each { |file|
+					next if /^\./ =~ file
+					puts "  #{file}"
+				}
 			}
 		end
 
