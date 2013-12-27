@@ -22,7 +22,7 @@ Gem::Specification.new do |gem|
 
   # dependency
   gem.add_dependency('rack')
-  gem.add_dependency('tilt')
+  gem.add_dependency('tilt', '~> 1.4.1')
   gem.add_dependency('mustache')
   gem.add_dependency('redcarpet', '>= 2.0.0')
   gem.add_dependency('json')
