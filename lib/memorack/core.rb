@@ -74,6 +74,7 @@ module MemoRack
 			# ロケールの読込み
 			I18n.load_path = @locale_paths
 			I18n.backend.load_translations
+			I18n.enforce_available_locales = false
 
 			@requires.each { |lib| require lib }
 			@locals = default_locals(@options)

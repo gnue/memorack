@@ -51,6 +51,7 @@ module MemoRack
 		def i18n_init
 			I18n.load_path = Dir[File.expand_path('../locales/*.yml', __FILE__)]
 			I18n.backend.load_translations
+			I18n.enforce_available_locales = false
 
 			locale = ENV['LANG'][0, 2].to_sym if ENV['LANG']
 			I18n.locale = locale if I18n.available_locales.include?(locale)
