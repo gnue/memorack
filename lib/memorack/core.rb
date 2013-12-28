@@ -5,6 +5,7 @@ require 'pathname'
 require 'rubygems'
 require 'i18n'
 
+require 'mustache'
 require 'memorack/tilt-mustache'
 require 'memorack/mdmenu'
 require 'memorack/locals'
@@ -600,7 +601,18 @@ module MemoRack
 		# Tilt に登録されている拡張子を集める
 		def extnames(extname)
 			klass = Tilt[extname]
-			Tilt.mappings.select { |key, value| value.member?(klass) }.collect { |key, value| key }
+			r = []
+
+			if Tilt.respond_to?(:mappings)
+				r |= Tilt.mappings.select { |key, value| value.member?(klass) }.collect { |key, value| key }
+			end
+
+			if Tilt.respond_to?(:default_mapping)
+				r |= Tilt.default_mapping.template_map.select { |key, value| value == klass }.collect { |key, value| key }
+				r |= Tilt.default_mapping.lazy_map.select { |key, value| value.assoc(klass.to_s) }.collect { |key, value| key }
+			end
+
+			r
 		end
 
 		# 対応フォーマットを取得する
