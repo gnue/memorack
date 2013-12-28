@@ -31,6 +31,7 @@ Gem::Specification.new do |gem|
   # for development
   gem.add_development_dependency('bundler', '~> 1.3')
   gem.add_development_dependency('rake')
+  gem.add_development_dependency('minitest', '~> 4.7') if Gem.ruby_version < Gem::Version.create('2.0')
   gem.add_development_dependency('turn')
   gem.add_development_dependency('rack-test')
   gem.add_development_dependency('org-ruby')
