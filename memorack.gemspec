@@ -35,6 +35,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency('minitest', '~> 4.7')
   gem.add_development_dependency('turn')
   gem.add_development_dependency('rack-test')
+  gem.add_development_dependency('org-ruby')
 
   gem.post_install_message = %Q{
     ==================
