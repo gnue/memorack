@@ -51,6 +51,7 @@ module MemoRack
 		def i18n_init
 			I18n.load_path = Dir[File.expand_path('../locales/*.yml', __FILE__)]
 			I18n.backend.load_translations
+			I18n.enforce_available_locales = false
 
 			locale = ENV['LANG'][0, 2].to_sym if ENV['LANG']
 			I18n.locale = locale if I18n.available_locales.include?(locale)
@@ -65,7 +66,7 @@ module MemoRack
 		# ディレクトリを繰返す
 		def dir_earch(dir, match = '**/*', flag = File::FNM_DOTMATCH)
 			Dir.chdir(dir) { |d|
-				Dir.glob(match, flag).each { |file|
+				Dir.glob(match, flag).sort.each { |file|
 					next if File.basename(file) =~ /^[.]{1,2}$/
 					file = File.join(file, '') if File.directory?(file)
 					yield(file)
@@ -79,9 +80,11 @@ module MemoRack
 
 			puts "#{domain}:"
 
-			Dir.foreach(themes) { |file|
-				next if /^\./ =~ file
-				puts "  #{file}"
+			Dir.open(themes) { |dir|
+				dir.sort.each { |file|
+					next if /^\./ =~ file
+					puts "  #{file}"
+				}
 			}
 		end
 
